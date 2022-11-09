@@ -1,3 +1,3 @@
-enum TransactionMode { IsLive, IsTesting }
+enum EnvironmentMode { IsLive, IsTesting }
 
-TransactionMode? environment;
+EnvironmentMode? environment;
