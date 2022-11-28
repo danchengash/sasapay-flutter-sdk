@@ -7,18 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:sasapay_sdk/services/api_urls.dart';
 import 'package:sasapay_sdk/services/custom_logger.dart';
+import 'package:sasapay_sdk/utils/helper_enums.dart';
 
 class DioHelperService {
   DioHelperService(
       {required this.consumerId,
       required this.consumerSecret,
-      required this.base_url});
+      required this.baseUrl});
 
-  // final dio = createDio();
   final String consumerId;
   final String consumerSecret;
-  final String base_url;
-  final tokenDio = Dio(BaseOptions(baseUrl: ApiUrls.BASE_URL_TESTING));
+  final String baseUrl;
+  // final tokenDio = Dio(BaseOptions(baseUrl: ApiUrls.BASE_URL_TESTING));
 
   // static final _singleton = HttpService._internal();
 
@@ -26,12 +26,14 @@ class DioHelperService {
 
   ///Always use this method to initialize the dio client
   Dio initializeDio() {
-    var dio = Dio(BaseOptions(
-      baseUrl: base_url,
-      receiveTimeout: 15000, // 15 seconds
-      connectTimeout: 15000,
-      sendTimeout: 15000,
-    ));
+    var dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        receiveTimeout: 15000, // 15 seconds
+        connectTimeout: 15000,
+        sendTimeout: 15000,
+      ),
+    );
 
     dio.interceptors.addAll({
       AppInterceptors(dio, consumerId, consumerSecret),
@@ -43,33 +45,35 @@ class DioHelperService {
 class AppInterceptors extends Interceptor {
   AppInterceptors(this.dio, this.consumerId, this.consumerSecret)
       : b64keySecret =
-            base64Url.encode((consumerId + ":" + consumerSecret).codeUnits);
+            base64Url.encode(("$consumerId:$consumerSecret").codeUnits);
 
   final Dio dio;
 
   ///setup values
   final String consumerId;
   final String consumerSecret;
-  late String b64keySecret;
-  late String? mAccessToken;
+  String b64keySecret;
+  String? mAccessToken;
   DateTime? mAccessExpiresAt;
   var logger = Logger(filter: CustomLogFilter());
+
   header() => mAccessToken != null
       ? {
           "Content-Type": "application/json",
           "Authorization": "Bearer $mAccessToken"
         }
       : {"Content-Type": "application/json"};
+
   @override
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    try {
-      await setAccessToken();
-    } catch (e) {
-      logger.e(e);
-    }
+    print("request----------");
+    
+    await setAccessToken();
+    print(mAccessToken);
+  
     options.headers = header();
-    logger.v("REQUEST[${options.method}] => PATH: ${options.path}"
+    logger.v("REQUEST[${options.method}] => PATH: ${options.uri}"
         "=> REQUEST VALUES: ${options.data} => HEADERS: ${options.headers}");
 
     return handler.next(options);
@@ -83,6 +87,9 @@ class AppInterceptors extends Interceptor {
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
+    logger
+        .e("Error[${err.response?.statusCode}] => DATA: ${err.response?.data}");
+
     switch (err.type) {
       case DioErrorType.connectTimeout:
       case DioErrorType.sendTimeout:
@@ -107,8 +114,6 @@ class AppInterceptors extends Interceptor {
       case DioErrorType.other:
         throw NoInternetConnectionException(err.requestOptions);
     }
-    logger
-        .e("Error[${err.response?.statusCode}] => DATA: ${err.response?.data}");
 
     return handler.next(err);
   }
@@ -116,12 +121,12 @@ class AppInterceptors extends Interceptor {
   Uri getAuthUrl() {
     ///Basically merges the various components of the provided params
     ///to generate one link for getting credentials before placing a request.
-    Uri uri = Uri(
-        scheme: 'https',
-        host: ApiUrls.BASE_URL_TESTING,
-        path: '/oauth/v1/generate',
-        queryParameters: <String, String>{'grant_type': 'client_credentials'});
-    return uri;
+
+    final url = environmentMode == Environment.Live
+        ? ApiUrls.BASE_URL_PRODUCTION
+        : ApiUrls.BASE_URL_TESTING;
+    final uri = Uri.parse(url + ApiUrls.TOKE_AUTH_URL);
+    return uri;  
   }
 
   Future<void> setAccessToken() async {
