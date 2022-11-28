@@ -1,9 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sasapay_sdk/initialize_sdk.dart';
 
 import 'package:sasapay_sdk/sasapay_sdk.dart';
 
 void main() {
   test('adds one to input values', () {
+
+    // SasaPay(clientId: );
     final calculator = Calculator();
     expect(calculator.addOne(2), 3);
     expect(calculator.addOne(-7), -6);
