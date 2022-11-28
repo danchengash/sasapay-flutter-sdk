@@ -19,23 +19,48 @@ class SasaPay {
   final String clientSecret;
 
   /// Environment the app is running on. It can either be `sandbox` or `production`
-  final EnvironmentMode environment;
+  final Environment environment;
 
   SasaPay(
       {required this.clientId,
       required this.clientSecret,
       required this.environment}) {
     dio = DioHelperService(
-            base_url: environment == EnvironmentMode.IsLive
+            baseUrl: environment == Environment.Live
                 ? ApiUrls.BASE_URL_PRODUCTION
                 : ApiUrls.BASE_URL_TESTING,
             consumerId: clientId,
             consumerSecret: clientSecret)
         .initializeDio();
+    environmentMode = environment;
   }
   Dio? dio;
 
-  registerConfirmationUrl() {
-    
+  Future<Response?> registerConfirmationUrl(
+      {required int merchantCode,
+      required String confirmationCallbackURL}) async {
+    Response? resp = await dio?.post(
+      ApiUrls.REGISTER_CONFIRMATION_URL,
+      data: {
+        "MerchantCode": merchantCode,
+        "ConfirmationURL": confirmationCallbackURL,
+      },
+    );
+    return resp;
   }
+
+  Future<Response?> registerValidationUrl(
+      {required int merchantCode,
+      required String validationCallbackURL}) async {
+    Response? resp = await dio?.post(
+      ApiUrls.REGISTER_VALIDATION_URL,
+      data: {
+        "MerchantCode": merchantCode,
+        "ValidationCallbackURL": validationCallbackURL,
+      },
+    );
+    return resp?.data;
+  }
+
+  static customer2Business() {}
 }
