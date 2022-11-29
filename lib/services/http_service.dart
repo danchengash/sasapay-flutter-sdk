@@ -68,10 +68,10 @@ class AppInterceptors extends Interceptor {
   void onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
     print("request----------");
-    
+
     await setAccessToken();
     print(mAccessToken);
-  
+
     options.headers = header();
     logger.v("REQUEST[${options.method}] => PATH: ${options.uri}"
         "=> REQUEST VALUES: ${options.data} => HEADERS: ${options.headers}");
@@ -126,36 +126,40 @@ class AppInterceptors extends Interceptor {
         ? ApiUrls.BASE_URL_PRODUCTION
         : ApiUrls.BASE_URL_TESTING;
     final uri = Uri.parse(url + ApiUrls.TOKE_AUTH_URL);
-    return uri;  
+    return uri;
   }
 
   Future<void> setAccessToken() async {
-    /// This method ensures that the token is in place before any request is
-    /// placed.
-    /// When called, it first checks if the previous token exists, if so, is it valid?
-    /// if still valid(by expiry time measure), terminates to indicate that
-    /// the token is set and ready for usage.
-    DateTime now = DateTime.now();
-    if (mAccessExpiresAt != null) {
-      if (now.isBefore(mAccessExpiresAt!)) {
-        return;
+    try {
+      /// This method ensures that the token is in place before any request is
+      /// placed.
+      /// When called, it first checks if the previous token exists, if so, is it valid?
+      /// if still valid(by expiry time measure), terminates to indicate that
+      /// the token is set and ready for usage.
+      DateTime now = DateTime.now();
+      if (mAccessExpiresAt != null) {
+        if (now.isBefore(mAccessExpiresAt!)) {
+          return;
+        }
       }
+
+      // todo: handle exceptions
+      HttpClient client = HttpClient();
+      HttpClientRequest req = await client.getUrl(getAuthUrl());
+      req.headers.add("Accept", "application/json");
+      req.headers.add("Authorization", "Basic $b64keySecret");
+      HttpClientResponse res = await req.close();
+
+      // u should use `await res.drain()` if u aren't reading the body
+      await res.transform(utf8.decoder).forEach((bodyString) {
+        dynamic jsondecodeBody = jsonDecode(bodyString);
+         mAccessToken = jsondecodeBody["access_token"].toString();
+        mAccessExpiresAt = now.add(Duration(
+            seconds: int.parse(jsondecodeBody["expires_in"].toString())));
+      });
+    } catch (e) {
+      logger.e(e);
     }
-
-    // todo: handle exceptions
-    HttpClient client = HttpClient();
-    HttpClientRequest req = await client.getUrl(getAuthUrl());
-    req.headers.add("Accept", "application/json");
-    req.headers.add("Authorization", "Basic $b64keySecret");
-    HttpClientResponse res = await req.close();
-
-    // u should use `await res.drain()` if u aren't reading the body
-    await res.transform(utf8.decoder).forEach((bodyString) {
-      dynamic jsondecodeBody = jsonDecode(bodyString);
-      mAccessToken = jsondecodeBody["access_token"].toString();
-      mAccessExpiresAt = now.add(Duration(
-          seconds: int.parse(jsondecodeBody["expires_in"].toString())));
-    });
   }
 }
 
