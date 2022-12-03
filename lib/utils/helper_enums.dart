@@ -1,3 +1,3 @@
-enum EnvironmentMode { IsLive, IsTesting }
+enum Environment { Live, Testing }
 
-EnvironmentMode? environment;
+Environment? environmentMode;
