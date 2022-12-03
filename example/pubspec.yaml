@@ -9,6 +9,7 @@ dependencies:
   fluttercontactpicker: ^4.7.0
   fluttertoast: ^8.1.1
   select_card: ^0.0.9
+  flutter_json_view: ^1.0.0
   get: ^4.6.5
   flutter: 
     sdk: flutter
