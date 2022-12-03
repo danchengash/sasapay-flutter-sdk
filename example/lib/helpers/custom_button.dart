@@ -16,50 +16,44 @@ class CustomElevatedButtonWithChild extends StatelessWidget {
     this.child,
     this.label,
     this.borderRadius,
-    this.fontSize,
+    this.fontSize = 20,
     this.width,
     this.height = 44.0,
-    this.gradient =
-        const LinearGradient(colors: [Color(0xff0D71E1), Color(0xff12E63D)]),
+    this.gradient = const LinearGradient(colors: [
+      Color(0xff003359),
+      Color(0xff005492),
+      Color.fromARGB(255, 13, 103, 167),
+    ]),
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final borderRadius = this.borderRadius ?? BorderRadius.circular(18);
-    return InkWell(
-      onTap: () {
-        onPressed!();
-      },
-      child: Container(
-        alignment: Alignment.center,
-        width: width,
-        padding: const EdgeInsets.all(5),
-        height: height,
-        decoration: BoxDecoration(
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.grey,
-              blurRadius: 2.0, // soften the shadow
-              spreadRadius: -0.9, //extend the shadow
-              offset: Offset(
-                0.0, // Move to right 10  horizontally
-                5.0, // Move to bottom 10 Vertically
+    return Material(
+      borderRadius: borderRadius,
+      elevation: 7,
+      child: InkWell(
+        onTap: () {
+          onPressed!();
+        },
+        child: Container(
+          alignment: Alignment.center,
+          width: width,
+          padding: const EdgeInsets.all(5),
+          height: height,
+          decoration: BoxDecoration(
+            gradient: gradient,
+            borderRadius: borderRadius,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                label ?? '',
+                style: TextStyle(color: Colors.white, fontSize: fontSize),
               ),
-            )
-          ],
-          gradient: gradient,
-          borderRadius: borderRadius,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              label ?? '',
-              style:
-                  TextStyle(color: Colors.white, fontSize: fontSize),
-            ),
-            child ?? const SizedBox.shrink()
-          ],
+            ],
+          ),
         ),
       ),
     );
