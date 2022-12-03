@@ -9,50 +9,88 @@ import 'package:sasapay_sdk/services/api_urls.dart';
 import 'package:sasapay_sdk/services/custom_logger.dart';
 import 'package:sasapay_sdk/utils/helper_enums.dart';
 
-class DioHelperService {
-  DioHelperService(
+enum Method { POST, GET, PUT, DELETE, PATCH }
+
+class DiohttpService {
+  DiohttpService(
       {required this.consumerId,
       required this.consumerSecret,
-      required this.baseUrl});
+      required this.baseUrl})
+      : b64keySecret =
+            base64Url.encode(("$consumerId:$consumerSecret").codeUnits);
 
   final String consumerId;
   final String consumerSecret;
   final String baseUrl;
-  // final tokenDio = Dio(BaseOptions(baseUrl: ApiUrls.BASE_URL_TESTING));
-
-  // static final _singleton = HttpService._internal();
-
-  // factory HttpService() => _singleton;
+  String? b64keySecret;
+  Dio? dio;
 
   ///Always use this method to initialize the dio client
   Dio initializeDio() {
-    var dio = Dio(
+    dio = Dio(
       BaseOptions(
-        baseUrl: baseUrl,
-        receiveTimeout: 15000, // 15 seconds
-        connectTimeout: 15000,
-        sendTimeout: 15000,
-      ),
+          baseUrl: baseUrl,
+          receiveTimeout: 15000, // 15 seconds
+          connectTimeout: 15000,
+          sendTimeout: 15000,
+          validateStatus: (status) {
+            return true;
+          }),
     );
 
-    dio.interceptors.addAll({
-      AppInterceptors(dio, consumerId, consumerSecret),
-    });
-    return dio;
+    dio?.interceptors.add(
+      InterceptorsWrapper(
+        onRequest:
+            (RequestOptions options, RequestInterceptorHandler handler) async {
+          await setAccessToken();
+          options.headers = header();
+          logger.v("REQUEST[${options.method}] => PATH: ${options.uri}"
+              "=> REQUEST VALUES: ${options.data} => HEADERS: ${options.headers}");
+
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          logger
+              .i("RESPONSE[${response.statusCode}] => DATA: ${response.data}");
+          return handler.next(response);
+        },
+        onError: (err, handler) {
+          logger.e(
+              "Error[${err.response?.statusCode}] => DATA: ${err.response?.data}");
+          switch (err.type) {
+            case DioErrorType.connectTimeout:
+            case DioErrorType.sendTimeout:
+            case DioErrorType.receiveTimeout:
+              throw DeadlineExceededException(err.requestOptions);
+            case DioErrorType.response:
+              switch (err.response?.statusCode) {
+                case 400:
+                  throw BadRequestException(err.requestOptions);
+                case 401:
+                  throw UnauthorizedException(err.requestOptions);
+                case 404:
+                  throw NotFoundException(err.requestOptions);
+                case 409:
+                  throw ConflictException(err.requestOptions);
+                case 500:
+                  throw InternalServerErrorException(err.requestOptions);
+              }
+              break;
+            case DioErrorType.cancel:
+              break;
+            case DioErrorType.other:
+              throw NoInternetConnectionException(err.requestOptions);
+
+            default:
+          }
+
+          // return handler.next(err);
+        },
+      ),
+    );
+    return dio!;
   }
-}
 
-class AppInterceptors extends Interceptor {
-  AppInterceptors(this.dio, this.consumerId, this.consumerSecret)
-      : b64keySecret =
-            base64Url.encode(("$consumerId:$consumerSecret").codeUnits);
-
-  final Dio dio;
-
-  ///setup values
-  final String consumerId;
-  final String consumerSecret;
-  String b64keySecret;
   String? mAccessToken;
   DateTime? mAccessExpiresAt;
   var logger = Logger(filter: CustomLogFilter());
@@ -63,60 +101,6 @@ class AppInterceptors extends Interceptor {
           "Authorization": "Bearer $mAccessToken"
         }
       : {"Content-Type": "application/json"};
-
-  @override
-  void onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
-    print("request----------");
-
-    await setAccessToken();
-    print(mAccessToken);
-
-    options.headers = header();
-    logger.v("REQUEST[${options.method}] => PATH: ${options.uri}"
-        "=> REQUEST VALUES: ${options.data} => HEADERS: ${options.headers}");
-
-    return handler.next(options);
-  }
-
-  @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    logger.i("RESPONSE[${response.statusCode}] => DATA: ${response.data}");
-    return handler.next(response);
-  }
-
-  @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
-    logger
-        .e("Error[${err.response?.statusCode}] => DATA: ${err.response?.data}");
-
-    switch (err.type) {
-      case DioErrorType.connectTimeout:
-      case DioErrorType.sendTimeout:
-      case DioErrorType.receiveTimeout:
-        throw DeadlineExceededException(err.requestOptions);
-      case DioErrorType.response:
-        switch (err.response?.statusCode) {
-          case 400:
-            throw BadRequestException(err.requestOptions);
-          case 401:
-            throw UnauthorizedException(err.requestOptions);
-          case 404:
-            throw NotFoundException(err.requestOptions);
-          case 409:
-            throw ConflictException(err.requestOptions);
-          case 500:
-            throw InternalServerErrorException(err.requestOptions);
-        }
-        break;
-      case DioErrorType.cancel:
-        break;
-      case DioErrorType.other:
-        throw NoInternetConnectionException(err.requestOptions);
-    }
-
-    return handler.next(err);
-  }
 
   Uri getAuthUrl() {
     ///Basically merges the various components of the provided params
@@ -153,12 +137,51 @@ class AppInterceptors extends Interceptor {
       // u should use `await res.drain()` if u aren't reading the body
       await res.transform(utf8.decoder).forEach((bodyString) {
         dynamic jsondecodeBody = jsonDecode(bodyString);
-         mAccessToken = jsondecodeBody["access_token"].toString();
+        mAccessToken = jsondecodeBody["access_token"].toString();
         mAccessExpiresAt = now.add(Duration(
             seconds: int.parse(jsondecodeBody["expires_in"].toString())));
       });
     } catch (e) {
       logger.e(e);
+    }
+  }
+
+  Future<dynamic> request(
+      {required String url,
+      required Method method,
+      Map<String, dynamic>? params,
+      Options? options,
+      FormData? formdata}) async {
+    Response response;
+
+    try {
+      if (method == Method.POST) {
+        if (formdata == null) {
+          response = await dio!.post(url, data: params, options: Options(
+            validateStatus: (status) {
+              return true;
+            },
+          ));
+        } else {
+          response = await dio!.post(url, data: formdata, options: options);
+        }
+      } else if (method == Method.DELETE) {
+        response = await dio!.delete(url);
+      } else if (method == Method.PATCH) {
+        response = await dio!.patch(url);
+      } else {
+        response = await dio!.get(url);
+      }
+      return response;
+    } on SocketException catch (e) {
+      throw Exception("Not Internet Connection");
+    } on FormatException catch (e) {
+      throw Exception("Bad response format");
+    } on DioError catch (e) {
+      return e.response?.data.toString();
+    } catch (e) {
+      logger.e(e);
+      throw Exception("Something went wrong");
     }
   }
 }
