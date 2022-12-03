@@ -1,4 +1,6 @@
+import 'package:example/screens/customer_to_business.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sasapay_sdk/sasapay_sdk.dart';
 import 'package:sasapay_sdk/utils/helper_enums.dart';
 
@@ -12,7 +14,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -34,11 +36,12 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+   SasaPay sasaPay = SasaPay(
+            clientId: "8mgx3sf4QhfZpN7aG9DIVdrrMVyTFxU89gz5gaur",
+            clientSecret:
+                "EWbIcQEhd3acV8vcAAyuldKpp2EaWNpda4GfQHuANW5biExHDLcGLuxJ6BV1UgHNODfXUUsQqwHBSlc9KINFofXQjQ7DuqI124aICYjsz5MiGn5KajTA8F1YbOQMhHtM",
+            environment: Environment.Testing,
+          );
 
   String response = "";
   @override
@@ -56,8 +59,10 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ElevatedButton(
-              onPressed: () {},
-              child: Text("test"),
+              onPressed: () {
+                Get.to(() =>  Customer2Business(sasaPay: sasaPay,));
+              },
+              child: Text("Customer to Business"),
             ),
             Text(response),
             Text(
@@ -69,15 +74,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          SasaPay sasaPay = SasaPay(
-            clientId: "yHKopXUeZNyxFqAyIyTNBu85v6SzLOoCepipa2Bl",
-            clientSecret:
-                "d2Our4qLYvo38aPHeqRt2lfUMAfwXyqoSG2UFZgWjZLoTNi6MVoAM72cTbEwB7U9dYSiXZiH0ZOtfX0c94dEVNM5mRK7Rgehm5padmcc8wdNKjt5JlLJ6KJatwMDWyMW",
-            environment: Environment.Testing,
-          );
+         
           final resp = await sasaPay.registerConfirmationUrl(
-            merchantCode: 600980,
-            confirmationCallbackURL: "https://8c54-41-90-115-26.eu.ngrok.io",
+            merchantCode: 600980.toString(),
+            confirmationCallbackURL: "https://5ee1-41-90-115-26.eu.ngrok.io",
           );
           print(resp);
           setState(() {
@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         tooltip: 'Test',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }

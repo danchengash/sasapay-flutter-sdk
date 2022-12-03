@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:example/helpers/custom_button.dart';
+import 'package:example/utils/utils_helpers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
@@ -10,7 +11,9 @@ import 'package:sasapay_sdk/helper_functions.dart';
 import 'package:sasapay_sdk/initialize_sdk.dart';
 
 class Customer2Business extends StatefulWidget {
-  const Customer2Business({Key? key}) : super(key: key);
+  Customer2Business({required this.sasaPay, Key? key}) : super(key: key);
+
+  SasaPay sasaPay;
 
   @override
   State<Customer2Business> createState() => _Customer2BusinessState();
@@ -18,12 +21,14 @@ class Customer2Business extends StatefulWidget {
 
 class _Customer2BusinessState extends State<Customer2Business> {
   int _selectedIndex = 0;
-  TextEditingController mobileController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
   TextEditingController amountController = TextEditingController();
-  TextEditingController accountController = TextEditingController();
+  TextEditingController reasonController = TextEditingController();
+
   final formKey = GlobalKey<FormState>();
 
   int? networkcode;
+  String? response;
 
   List<String?> images = [
     "assets/images/sasapay.png",
@@ -31,6 +36,8 @@ class _Customer2BusinessState extends State<Customer2Business> {
     "assets/images/airtel_money.jpeg",
     "assets/images/t_kash.png",
   ];
+
+  bool loading = false;
 
   @override
   void initState() {
@@ -104,35 +111,38 @@ class _Customer2BusinessState extends State<Customer2Business> {
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: width / 43),
-                        child: SelectGroupCard(context,
-                            titles: const [
-                              "Sasa Pay",
-                              "Mpesa",
-                              "Airtel",
-                              "Tkash"
-                            ],
-                            imageSourceType: ImageSourceType.asset,
-                            images: images,
-                            contents: const [
-                              "Sasa Pay",
-                              "Mpesa",
-                              "Airtel",
-                              "Tkash"
-                            ],
-                            cardBackgroundColor:
-                                const Color.fromARGB(255, 135, 200, 246),
-                            cardSelectedColor:
-                                const Color.fromARGB(255, 172, 0, 32),
-                            titleTextColor:
-                                const Color.fromARGB(255, 0, 15, 28),
-                            contentTextColor: Colors.black87, onTap: (title) {
-                          setState(() {
-                            networkcode =
-                                SasaPay.getNetworkCode(networkTitle: title);
-                          });
+                        child: SizedBox(
+                          width: width / 0.35,
+                          child: SelectGroupCard(context,
+                              titles: const [
+                                "Sasa Pay",
+                                "Mpesa",
+                                "Airtel",
+                                "Tkash"
+                              ],
+                              imageSourceType: ImageSourceType.asset,
+                              images: images,
+                              contents: const [
+                                "Sasa Pay",
+                                "Mpesa",
+                                "Airtel",
+                                "Tkash"
+                              ],
+                              cardBackgroundColor:
+                                  const Color.fromARGB(255, 135, 200, 246),
+                              cardSelectedColor:
+                                  const Color.fromARGB(255, 172, 0, 32),
+                              titleTextColor:
+                                  const Color.fromARGB(255, 0, 15, 28),
+                              contentTextColor: Colors.black87, onTap: (title) {
+                            setState(() {
+                              networkcode =
+                                  SasaPay.getNetworkCode(networkTitle: title);
+                            });
 
-                          debugPrint(networkcode.toString());
-                        }),
+                            debugPrint(networkcode.toString());
+                          }),
+                        ),
                       ),
                       SizedBox(
                         height: height / 35,
@@ -162,7 +172,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                           child: TextFormField(
                             autofocus: false,
                             keyboardType: TextInputType.number,
-                            controller: mobileController,
+                            controller: phoneNumberController,
                             validator: (v) {
                               if (v!.length < 9) {
                                 return "Enter valid mobile number";
@@ -182,7 +192,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                   tooltip: "Pick from contacts.",
                                   icon: const Icon(Icons.search),
                                   onPressed: () async {
-                                    var number = mobileController.text;
+                                    var number = phoneNumberController.text;
                                     bool hasPermission =
                                         await FlutterContactPicker
                                             .hasPermission();
@@ -198,7 +208,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                         setState(() {
                                           var numb = number.split("+254")[1];
                                           numb = "0" + numb;
-                                          mobileController.text =
+                                          phoneNumberController.text =
                                               numb.replaceAll(" ", "").trim();
                                         });
                                       } else {
@@ -209,7 +219,8 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                               .replaceAll("(", "")
                                               .replaceAll(")", "")
                                               .replaceAll("-", "");
-                                          mobileController.text = numb.trim();
+                                          phoneNumberController.text =
+                                              numb.trim();
                                         });
                                       }
                                     } else {
@@ -224,7 +235,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                         setState(() {
                                           var numb = number.split("+254")[1];
                                           numb = "0" + numb;
-                                          mobileController.text =
+                                          phoneNumberController.text =
                                               numb.replaceAll(" ", "").trim();
                                         });
                                       } else {
@@ -235,7 +246,8 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                               .replaceAll("(", "")
                                               .replaceAll(")", "")
                                               .replaceAll("-", "");
-                                          mobileController.text = numb.trim();
+                                          phoneNumberController.text =
+                                              numb.trim();
                                         });
                                       }
                                     }
@@ -369,6 +381,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                           width: width,
                           height: height / 17,
                           child: TextField(
+                            controller: reasonController,
                             autofocus: false,
                             onChanged: (value) {
                               selectedReason = value.trim();
@@ -405,18 +418,59 @@ class _Customer2BusinessState extends State<Customer2Business> {
                       SizedBox(
                         height: height / 30,
                       ),
-                      Container(
-                          width: width / 1.6,
-                          //alignment: Alignment.center,
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(20),
+                      loading
+                          ? CircularProgressIndicator()
+                          : CustomElevatedButtonWithChild(
+                              width: width / 1.6,
+                              onPressed: (() async {
+                                try {
+                                  if (formKey.currentState!.validate()) {
+                                    setState(() {
+                                      loading = true;
+                                      response = "Registering call back url";
+                                    });
+
+                                    var resp = await widget.sasaPay
+                                        .registerConfirmationUrl(
+                                      merchantCode: 600980.toString(),
+                                      confirmationCallbackURL:
+                                          "https://6fb9-41-90-115-26.eu.ngrok.io",
+                                    );
+                                    print(resp);
+                                    setState(() {
+                                      response = resp?.data?.toString() ?? "";
+                                    });
+                                    // final amount =
+                                    //     double.tryParse(amountController.text);
+                                    // resp = await widget.sasaPay
+                                    //     .customer2BusinessPhoneNumber(
+                                    //         merchantCode: MERCHANT_CODE,
+                                    //         networkCode: networkcode.toString(),
+                                    //         transactionDesc:
+                                    //             reasonController.text,
+                                    //         phoneNumber:
+                                    //             phoneNumberController.text,
+                                    //         accountReference:
+                                    //             phoneNumberController.text,
+                                    //         amount: amount!,
+                                    //         callBackURL:
+                                    //             "https://6fb9-41-90-115-26.eu.ngrok.io");
+                                    setState(() {
+                                      loading = false;
+                                      response = resp?.data.toString();
+                                    });
+                                  }
+                                } catch (e) {
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                } finally {
+                                  setState(() {});
+                                }
+                              }),
+                              label: 'submit',
                             ),
-                          ),
-                          child: CustomElevatedButtonWithChild(
-                            onPressed: (() {}),
-                            label: 'submit',
-                          )),
+                      Text(response ?? '')
                     ],
                   ),
                 ],
