@@ -91,9 +91,9 @@ class SasaPay {
         "CallBackURL": callBackURL
       },
     );
-    Logger().w(response?.data.toString());
+  
 
-    return response?.data;
+    return response;
   }
 
   /// Get the matching network codes of each service provider

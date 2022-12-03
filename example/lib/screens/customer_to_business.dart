@@ -4,6 +4,7 @@ import 'package:example/helpers/custom_button.dart';
 import 'package:example/utils/utils_helpers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:example/helpers/themes_colors.dart';
 import 'package:select_card/select_card.dart';
@@ -28,7 +29,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
   final formKey = GlobalKey<FormState>();
 
   int? networkcode;
-  String? response;
+  Map<String, dynamic> response = {};
 
   List<String?> images = [
     "assets/images/sasapay.png",
@@ -420,44 +421,33 @@ class _Customer2BusinessState extends State<Customer2Business> {
                       ),
                       loading
                           ? CircularProgressIndicator()
-                          : CustomElevatedButtonWithChild(
+                          : CustomElevatedButton(
                               width: width / 1.6,
                               onPressed: (() async {
                                 try {
                                   if (formKey.currentState!.validate()) {
                                     setState(() {
                                       loading = true;
-                                      response = "Registering call back url";
+                                      response = {"processing..": ".."};
                                     });
-
+                                    final amount =
+                                        double.tryParse(amountController.text);
                                     var resp = await widget.sasaPay
-                                        .registerConfirmationUrl(
-                                      merchantCode: 600980.toString(),
-                                      confirmationCallbackURL:
-                                          "https://6fb9-41-90-115-26.eu.ngrok.io",
-                                    );
-                                    print(resp);
-                                    setState(() {
-                                      response = resp?.data?.toString() ?? "";
-                                    });
-                                    // final amount =
-                                    //     double.tryParse(amountController.text);
-                                    // resp = await widget.sasaPay
-                                    //     .customer2BusinessPhoneNumber(
-                                    //         merchantCode: MERCHANT_CODE,
-                                    //         networkCode: networkcode.toString(),
-                                    //         transactionDesc:
-                                    //             reasonController.text,
-                                    //         phoneNumber:
-                                    //             phoneNumberController.text,
-                                    //         accountReference:
-                                    //             phoneNumberController.text,
-                                    //         amount: amount!,
-                                    //         callBackURL:
-                                    //             "https://6fb9-41-90-115-26.eu.ngrok.io");
+                                        .customer2BusinessPhoneNumber(
+                                            merchantCode: MERCHANT_CODE,
+                                            networkCode: networkcode.toString(),
+                                            transactionDesc:
+                                                reasonController.text,
+                                            phoneNumber:
+                                                phoneNumberController.text,
+                                            accountReference:
+                                                phoneNumberController.text,
+                                            amount: amount!,
+                                            callBackURL:
+                                                "https://6fb9-41-90-115-26.eu.ngrok.io");
                                     setState(() {
                                       loading = false;
-                                      response = resp?.data.toString();
+                                      response = resp?.data;
                                     });
                                   }
                                 } catch (e) {
@@ -470,7 +460,16 @@ class _Customer2BusinessState extends State<Customer2Business> {
                               }),
                               label: 'submit',
                             ),
-                      Text(response ?? '')
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: JsonView.map(response),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      )
                     ],
                   ),
                 ],

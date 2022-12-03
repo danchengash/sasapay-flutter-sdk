@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomElevatedButtonWithChild extends StatelessWidget {
+class CustomElevatedButton extends StatelessWidget {
   final BorderRadiusGeometry? borderRadius;
   final double? width;
   final double height;
@@ -10,7 +10,7 @@ class CustomElevatedButtonWithChild extends StatelessWidget {
   final String? label;
   final double? fontSize;
 
-  const CustomElevatedButtonWithChild({
+  const CustomElevatedButton({
     Key? key,
     required this.onPressed,
     this.child,
