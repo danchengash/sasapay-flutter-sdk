@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:logger/logger.dart';
 import 'package:sasapay_sdk/services/api_urls.dart';
 import 'package:sasapay_sdk/services/http_service.dart';
 import 'package:sasapay_sdk/utils/helper_enums.dart';
@@ -25,36 +26,39 @@ class SasaPay {
       {required this.clientId,
       required this.clientSecret,
       required this.environment}) {
-    dio = DioHelperService(
-            baseUrl: environment == Environment.Live
-                ? ApiUrls.BASE_URL_PRODUCTION
-                : ApiUrls.BASE_URL_TESTING,
-            consumerId: clientId,
-            consumerSecret: clientSecret)
-        .initializeDio();
+    httpService = DiohttpService(
+      baseUrl: environment == Environment.Live
+          ? ApiUrls.BASE_URL_PRODUCTION
+          : ApiUrls.BASE_URL_TESTING,
+      consumerId: clientId.trim(),
+      consumerSecret: clientSecret.trim(),
+    );
+    httpService?.initializeDio();
     environmentMode = environment;
   }
-  Dio? dio;
+  DiohttpService? httpService;
 
   Future<Response?> registerConfirmationUrl(
-      {required int merchantCode,
+      {required String merchantCode,
       required String confirmationCallbackURL}) async {
-    Response? resp = await dio?.post(
-      ApiUrls.REGISTER_CONFIRMATION_URL,
-      data: {
+    var resp = await httpService?.request(
+      url: ApiUrls.REGISTER_CONFIRMATION_URL,
+      method: Method.POST,
+      params: {
         "MerchantCode": merchantCode,
-        "ConfirmationURL": confirmationCallbackURL,
+        "ConfirmationUrl": confirmationCallbackURL.trim(),
       },
     );
     return resp;
   }
 
   Future<Response?> registerValidationUrl(
-      {required int merchantCode,
+      {required String merchantCode,
       required String validationCallbackURL}) async {
-    Response? resp = await dio?.post(
-      ApiUrls.REGISTER_VALIDATION_URL,
-      data: {
+    Response? resp = await httpService?.request(
+      url: ApiUrls.REGISTER_VALIDATION_URL,
+      method: Method.POST,
+      params: {
         "MerchantCode": merchantCode,
         "ValidationCallbackURL": validationCallbackURL,
       },
@@ -62,5 +66,58 @@ class SasaPay {
     return resp?.data;
   }
 
-  static customer2Business() {}
+  Future<Response?> customer2BusinessPhoneNumber({
+    required String merchantCode,
+
+    /// SasaPay(0) 63902(MPesa) 63903(AirtelMoney) 63907(T-Kash)
+    required String networkCode,
+    required String phoneNumber,
+    String? transactionDesc,
+    String? accountReference,
+    required double amount,
+    required String callBackURL,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.CUSTOMER_2_BUSINESS_URL,
+      method: Method.POST,
+      params: {
+        "MerchantCode": merchantCode,
+        "NetworkCode": networkCode,
+        "PhoneNumber": phoneNumber,
+        "TransactionDesc": transactionDesc ?? '',
+        "AccountReference": accountReference ?? '',
+        "Currency": "KES",
+        "Amount": amount,
+        "CallBackURL": callBackURL
+      },
+    );
+    Logger().w(response?.data.toString());
+
+    return response?.data;
+  }
+
+  /// Get the matching network codes of each service provider
+  static int? getNetworkCode({required String networkTitle}) {
+    //remove spaces, dashes,fullstops,trim the string then to lowercase
+    String netw = networkTitle
+        .replaceAll(" ", "")
+        .replaceAll("-", "")
+        .replaceAll(".", "")
+        .trim()
+        .toLowerCase();
+
+    switch (netw) {
+      case "sasapay":
+        return 0;
+      case "mpesa":
+        return 63902;
+      case "airtel":
+        return 63903;
+      case "tkash":
+        return 63907;
+
+      default:
+        return null;
+    }
+  }
 }
