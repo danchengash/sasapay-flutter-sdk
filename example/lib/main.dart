@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   CustomElevatedButton(
                     onPressed: () {
                       Get.to(
-                        () => Business2Customer(
+                        () => Customer2Business(
                           sasaPay: sasaPay,
                         ),
                       );
@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   CustomElevatedButton(
                     onPressed: () {
                       Get.to(
-                        () => Customer2Business(
+                        () => Business2Customer(
                           sasaPay: sasaPay,
                         ),
                       );
