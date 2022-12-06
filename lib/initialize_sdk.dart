@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
+import 'package:sasapay_sdk/models/bank_model.dart';
 import 'package:sasapay_sdk/services/api_urls.dart';
 import 'package:sasapay_sdk/services/http_service.dart';
-import 'package:sasapay_sdk/utils/helper_enums.dart';
+import 'package:sasapay_sdk/utils/helper_enums_consts.dart';
 
 /// Initializes a new instance of [SasaPay]
 /// Requires 3 parameters:
@@ -20,14 +23,14 @@ class SasaPay {
   final String clientSecret;
 
   /// Environment the app is running on. It can either be `sandbox` or `production`
-  final Environment environment;
+  final EnvironmentSasaPay environment;
 
   SasaPay(
       {required this.clientId,
       required this.clientSecret,
       required this.environment}) {
     httpService = DiohttpService(
-      baseUrl: environment == Environment.Live
+      baseUrl: environment == EnvironmentSasaPay.Live
           ? ApiUrls.BASE_URL_PRODUCTION
           : ApiUrls.BASE_URL_TESTING,
       consumerId: clientId.trim(),
@@ -36,7 +39,7 @@ class SasaPay {
     httpService?.initializeDio();
     environmentMode = environment;
   }
-  DiohttpService? httpService;
+  static DiohttpService? httpService;
 
   Future<Response?> registerConfirmationUrl(
       {required String merchantCode,
@@ -191,4 +194,32 @@ class SasaPay {
         return null;
     }
   }
+
+static List<BanksChannelCode?> getBanksCodes()  {
+  List<BanksChannelCode> banks= [];
+  for (var element in kbanksCodesSasapay) {
+    banks.add(BanksChannelCode.fromJson(element));
+    
+  }
+   
+    return banks;
+  }
+
+  // static Future<BankModel?> getBanksCodes() async {
+  //   BankModel? bankModel;
+
+  //   final resp = await httpService?.request(
+  //     url: ApiUrls.GET_BANK_CODES_URL,
+  //     method: Method.GET,
+  //   );
+  //   if (resp != null) {
+  //     Map<String, dynamic> result = jsonDecode(resp.toString());
+  //     if (result["status"] == "0") {
+  //       return BankModel.fromJson(result);
+  //     }
+  //   } else {
+  //     return bankModel;
+  //   }
+  //   return null;
+  // }
 }
