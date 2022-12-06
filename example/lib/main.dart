@@ -1,12 +1,14 @@
 import 'package:example/helpers/custom_button.dart';
 import 'package:example/screens/customer_to_business.dart';
+import 'package:example/utils/init_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:get/get.dart';
 import 'package:sasapay_sdk/sasapay_sdk.dart';
 import 'package:sasapay_sdk/utils/helper_enums.dart';
 
-void main() {
+void main() async {
+  sasaPayServicesInit();
   runApp(const MyApp());
 }
 
@@ -38,19 +40,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  SasaPay sasaPay = SasaPay(
-    clientId: "8mgx3sf4QhfZpN7aG9DIVdrrMVyTFxU89gz5gaur",
-    clientSecret:
-        "EWbIcQEhd3acV8vcAAyuldKpp2EaWNpda4GfQHuANW5biExHDLcGLuxJ6BV1UgHNODfXUUsQqwHBSlc9KINFofXQjQ7DuqI124aICYjsz5MiGn5KajTA8F1YbOQMhHtM",
-    environment: Environment.Testing,
-  );
+  SasaPay sasaPay = Get.find<SasaPay>();
 
   Map<String, dynamic> response = {};
   bool loading = false;
   registerConfirmationUrl() async {
     setState(() {
       loading = true;
-      response = {"Registering call back url...": "s"};
+      response = {"Registering call back url...": "...."};
     });
 
     var resp = await sasaPay.registerConfirmationUrl(
@@ -88,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 label: "Customer to Business",
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               CustomElevatedButton(
@@ -96,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: () {
                     registerConfirmationUrl();
                   }),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               JsonView.map(response),
