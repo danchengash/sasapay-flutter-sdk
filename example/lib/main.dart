@@ -1,4 +1,5 @@
 import 'package:example/helpers/custom_button.dart';
+import 'package:example/screens/business_to_customer.dart';
 import 'package:example/screens/customer_to_business.dart';
 import 'package:example/utils/init_services.dart';
 import 'package:example/utils/utils_helpers.dart';
@@ -74,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: SingleChildScrollView(
           child: SizedBox(
-            height: height*1.2,
+            height: height * 1.2,
             width: width,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -93,12 +94,25 @@ class _MyHomePageState extends State<MyHomePage> {
                   CustomElevatedButton(
                     onPressed: () {
                       Get.to(
+                        () => Business2Customer(
+                          sasaPay: sasaPay,
+                        ),
+                      );
+                    },
+                    label: "CUSTOMER to Business.",
+                  ),
+                  SizedBox(
+                    height: height / 33,
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
                         () => Customer2Business(
                           sasaPay: sasaPay,
                         ),
                       );
                     },
-                    label: "Customer to Business",
+                    label: "BUSINESS to Customer.",
                   ),
                   const SizedBox(
                     height: 20,
