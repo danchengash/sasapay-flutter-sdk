@@ -142,6 +142,31 @@ class SasaPay {
     return response;
   }
 
+  Future<Response?> business2Customer({
+    required String merchantCode,
+    required double amount,
+    required String receiverNumber,
+    String? transactionDesc,
+    String? accountReference,
+    required String callBackURL,
+  }) async {
+    Response? response = await httpService?.request(
+        url: ApiUrls.BUSINESS_2_CUSTOMER_URL,
+        method: Method.POST,
+        params: {
+          "MerchantCode": merchantCode,
+          "MerchantTransactionReference": accountReference,
+          "Amount": amount,
+          "Currency": "KES",
+          "ReceiverNumber": receiverNumber,
+          "Channel": "0",
+          "Reason": transactionDesc,
+          "CallBackURL": callBackURL
+        });
+
+    return response;
+  }
+
   /// Get the matching network codes of each service provider
   static int? getNetworkCode({required String networkTitle}) {
     //remove spaces, dashes,fullstops,trim the string then to lowercase
