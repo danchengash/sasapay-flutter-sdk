@@ -297,7 +297,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                             child: Text(
                               "Amount",
                               style: TextStyle(
-                                color: notifire.getdarkscolor,
+                                color: CustomColor.getdarkcolor,
                                 fontFamily: 'Gilroy Bold',
                                 fontSize: height / 43,
                               ),
@@ -319,7 +319,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                               Radius.circular(10),
                             ),
                             border: Border.all(
-                              color: notifire.blueColor.withOpacity(0.1),
+                              color: CustomColor.blueColor.withOpacity(0.1),
                             ),
                           ),
                           child: Column(
@@ -345,7 +345,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                 padding: EdgeInsets.only(left: width / 20),
                                 child: TextFormField(
                                   style: TextStyle(
-                                      color: notifire.getdarkscolor,
+                                      color: CustomColor.getdarkcolor,
                                       fontSize: height / 40),
                                   cursorColor: Colors.black,
                                   keyboardType: TextInputType.number,
@@ -366,7 +366,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                       hintText: "KES 0",
                                       hintStyle: TextStyle(
                                           fontSize: height / 30,
-                                          color: notifire.getdarkscolor
+                                          color: CustomColor.getdarkcolor
                                               .withOpacity(0.4),
                                           fontFamily: 'Gilroy Bold')),
                                 ),
@@ -392,11 +392,11 @@ class _Customer2BusinessState extends State<Customer2Business> {
                             },
                             style: TextStyle(
                               fontSize: height / 50,
-                              color: notifire.getdarkscolor,
+                              color: CustomColor.getdarkcolor,
                             ),
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: notifire.getdarkwhitecolor,
+                              fillColor: CustomColor.getdarkwhitecolor,
                               hintText: "Reason(optional)",
                               hintStyle: TextStyle(
                                   color: Colors.grey, fontSize: height / 60),
