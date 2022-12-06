@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:get/get.dart';
 import 'package:sasapay_sdk/sasapay_sdk.dart';
-import 'package:sasapay_sdk/utils/helper_enums.dart';
+import 'package:sasapay_sdk/utils/helper_enums_consts.dart';
+import 'package:sasapay_sdk/models/bank_model.dart';
 
 void main() async {
   sasaPayServicesInit();
@@ -64,43 +65,78 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              CustomElevatedButton(
-                onPressed: () {
-                  Get.to(
-                    () => Customer2Business(
-                      sasaPay: sasaPay,
+        child: SingleChildScrollView(
+          child: SizedBox(
+            height: height*1.2,
+            width: width,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Visibility(
+                      visible: loading,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
                     ),
-                  );
-                },
-                label: "Customer to Business",
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => Customer2Business(
+                          sasaPay: sasaPay,
+                        ),
+                      );
+                    },
+                    label: "Customer to Business",
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                      label: "Register confirmation url",
+                      onPressed: () {
+                        registerConfirmationUrl();
+                      }),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  CustomElevatedButton(
+                      label: "Get bank channel codes",
+                      onPressed: () async {
+                        setState(() {
+                          loading = true;
+                          response = {"Getting bank codes": "...."};
+                        });
+                        List<BanksChannelCode?> result =
+                            SasaPay.getBanksCodes();
+                        setState(() {
+                          loading = false;
+                          response = Map.fromIterable(result,
+                              key: (v) => v.bankName, value: (v) => v.bankCode);
+                          ;
+                        });
+                      }),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  JsonView.map(response),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              CustomElevatedButton(
-                  label: "Reg confirmation url",
-                  onPressed: () {
-                    registerConfirmationUrl();
-                  }),
-              const SizedBox(
-                height: 30,
-              ),
-              JsonView.map(response),
-            ],
+            ),
           ),
         ),
       ),
