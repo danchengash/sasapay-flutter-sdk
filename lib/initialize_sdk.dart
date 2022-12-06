@@ -149,6 +149,7 @@ class SasaPay {
     required String merchantCode,
     required double amount,
     required String receiverNumber,
+    required String channelCode,
     String? transactionDesc,
     String? accountReference,
     required String callBackURL,
@@ -162,7 +163,7 @@ class SasaPay {
           "Amount": amount,
           "Currency": "KES",
           "ReceiverNumber": receiverNumber,
-          "Channel": "0",
+          "Channel": channelCode,
           "Reason": transactionDesc,
           "CallBackURL": callBackURL
         });
@@ -195,13 +196,12 @@ class SasaPay {
     }
   }
 
-static List<BanksChannelCode?> getBanksCodes()  {
-  List<BanksChannelCode> banks= [];
-  for (var element in kbanksCodesSasapay) {
-    banks.add(BanksChannelCode.fromJson(element));
-    
-  }
-   
+  static List<BanksChannelCode?> getBanksCodes() {
+    List<BanksChannelCode> banks = [];
+    for (var element in kbanksCodesSasapay) {
+      banks.add(BanksChannelCode.fromJson(element));
+    }
+
     return banks;
   }
 
