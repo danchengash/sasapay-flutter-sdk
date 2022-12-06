@@ -91,7 +91,53 @@ class SasaPay {
         "CallBackURL": callBackURL
       },
     );
-  
+
+    return response;
+  }
+
+  Future<Response?> customer2BusinessAliasNumber({
+    required String merchantCode,
+
+    /// SasaPay(0) 63902(MPesa) 63903(AirtelMoney) 63907(T-Kash)
+    required String networkCode,
+    required String aliasNumber,
+    String? transactionDesc,
+    String? accountReference,
+    required double amount,
+    required String callBackURL,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.CUSTOMER_2_BUSINESS_Alias_URL,
+      method: Method.POST,
+      params: {
+        "MerchantCode": merchantCode,
+        "NetworkCode": networkCode,
+        "AliasNumber": aliasNumber,
+        "TransactionDesc": transactionDesc ?? '',
+        "AccountReference": accountReference ?? '',
+        "Currency": "KES",
+        "Amount": amount,
+        "CallBackURL": callBackURL
+      },
+    );
+
+    return response;
+  }
+
+  Future<Response?> processC2Bpayment({
+    required String merchantCode,
+    required String checkoutRequestID,
+    required String verificationCode,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.PROCESS_PAYMENT_URL,
+      method: Method.POST,
+      params: {
+        "CheckoutRequestID": checkoutRequestID,
+        "MerchantCode": merchantCode,
+        "VerificationCode": verificationCode
+      },
+    );
 
     return response;
   }
