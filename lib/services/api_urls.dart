@@ -12,4 +12,8 @@ class ApiUrls {
   static String REGISTER_VALIDATION_URL = "payments/register-ipn-url/";
 
   static String CUSTOMER_2_BUSINESS_URL = "payments/request-payment/";
+  static String CUSTOMER_2_BUSINESS_Alias_URL =
+      "payments/request-payment-by-alias/";
+
+  static String PROCESS_PAYMENT_URL = "payments/process-payment/";
 }
