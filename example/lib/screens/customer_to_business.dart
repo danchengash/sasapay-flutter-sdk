@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:example/helpers/custom_button.dart';
+import 'package:example/screens/process_payment.dart';
 import 'package:example/utils/utils_helpers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:example/helpers/themes_colors.dart';
+import 'package:get/get.dart';
 import 'package:select_card/select_card.dart';
 import 'package:sasapay_sdk/helper_functions.dart';
 import 'package:sasapay_sdk/initialize_sdk.dart';
@@ -46,6 +48,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
   }
 
   String? selectedReason;
+  bool showprocessPayment = false;
 
   @override
   Widget build(BuildContext context) {
@@ -420,7 +423,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                         height: height / 30,
                       ),
                       loading
-                          ? CircularProgressIndicator()
+                          ? const CircularProgressIndicator()
                           : CustomElevatedButton(
                               width: width / 1.6,
                               onPressed: (() async {
@@ -443,11 +446,11 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                             accountReference:
                                                 phoneNumberController.text,
                                             amount: amount!,
-                                            callBackURL:
-                                                "https://6fb9-41-90-115-26.eu.ngrok.io");
+                                            callBackURL: CALL_BACK_URL);
                                     setState(() {
                                       loading = false;
                                       response = resp?.data;
+                                      showprocessPayment = response["status"];
                                     });
                                   }
                                 } catch (e) {
@@ -460,14 +463,28 @@ class _Customer2BusinessState extends State<Customer2Business> {
                               }),
                               label: 'submit',
                             ),
-                      SizedBox(
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      Visibility(
+                        visible: showprocessPayment,
+                        child: CustomElevatedButton(
+                          onPressed: () {
+                            Get.to(() => ProcessPaymentPage(
+                                checkoutRequestId:
+                                    response["CheckoutRequestID"]));
+                          },
+                          label: "Process Payment",
+                        ),
+                      ),
+                      const SizedBox(
                         height: 30,
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: JsonView.map(response),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       )
                     ],
