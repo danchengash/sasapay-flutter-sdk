@@ -10,6 +10,7 @@ dependencies:
   fluttertoast: ^8.1.1
   select_card: ^0.0.9
   flutter_json_view: ^1.0.0
+  pinput: ^2.2.16
   get: ^4.6.5
   flutter: 
     sdk: flutter
