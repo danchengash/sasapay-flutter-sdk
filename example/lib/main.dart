@@ -1,6 +1,7 @@
 import 'package:example/helpers/custom_button.dart';
 import 'package:example/screens/customer_to_business.dart';
 import 'package:example/utils/init_services.dart';
+import 'package:example/utils/utils_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:get/get.dart';
@@ -52,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     var resp = await sasaPay.registerConfirmationUrl(
       merchantCode: 600980.toString(),
-      confirmationCallbackURL: "https://6fb9-41-90-115-26.eu.ngrok.io",
+      confirmationCallbackURL: CALL_BACK_URL,
     );
 
     setState(() {
@@ -79,9 +80,11 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               CustomElevatedButton(
                 onPressed: () {
-                  Get.to(() => Customer2Business(
-                        sasaPay: sasaPay,
-                      ));
+                  Get.to(
+                    () => Customer2Business(
+                      sasaPay: sasaPay,
+                    ),
+                  );
                 },
                 label: "Customer to Business",
               ),
@@ -105,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () async {
           final resp = await sasaPay.registerConfirmationUrl(
             merchantCode: 600980.toString(),
-            confirmationCallbackURL: "https://5ee1-41-90-115-26.eu.ngrok.io",
+            confirmationCallbackURL: CALL_BACK_URL,
           );
           print(resp);
           setState(() {
