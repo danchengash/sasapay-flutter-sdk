@@ -16,4 +16,5 @@ class ApiUrls {
       "payments/request-payment-by-alias/";
 
   static String PROCESS_PAYMENT_URL = "payments/process-payment/";
+  static String BUSINESS_2_CUSTOMER_URL = "payments/b2c/";
 }
