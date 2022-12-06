@@ -80,7 +80,7 @@ class _Business2CustomerState extends State<Business2Customer> {
                             ),
                             const Spacer(),
                             Text(
-                              "Customer to business transfer",
+                              "Business to Customer transfer",
                               style: TextStyle(
                                   fontSize: height / 45,
                                   fontFamily: 'Gilroy Bold'),
@@ -113,7 +113,7 @@ class _Business2CustomerState extends State<Business2Customer> {
                       ),
                       Container(
                         height: height / 17,
-                        width: width / 1.25,
+                        width: width / 1.12,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
@@ -122,16 +122,14 @@ class _Business2CustomerState extends State<Business2Customer> {
                         ),
                         child: DropdownButton(
                           underline: const SizedBox(),
-                          // Initial Value
                           value: selectedBank,
-
-                          // Down Arrow Icon
                           icon: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              SizedBox(width: width / 3.5),
+                              SizedBox(width: width / 4),
                               Icon(
                                 Icons.arrow_drop_down_outlined,
-                                color: notifire.getdarkscolor,
+                                color: CustomColor.getdarkcolor,
                               ),
                             ],
                           ),
@@ -155,7 +153,7 @@ class _Business2CustomerState extends State<Business2Customer> {
                           // change button value to selected value
                           onChanged: (newValue) {
                             setState(() {
-                              selectedBank = newValue!;
+                              selectedBank = newValue;
                             });
                           },
                         ),
@@ -309,7 +307,7 @@ class _Business2CustomerState extends State<Business2Customer> {
                             child: Text(
                               "Amount",
                               style: TextStyle(
-                                color: notifire.getdarkscolor,
+                                color: CustomColor.getdarkcolor,
                                 fontFamily: 'Gilroy Bold',
                                 fontSize: height / 43,
                               ),
@@ -331,7 +329,7 @@ class _Business2CustomerState extends State<Business2Customer> {
                               Radius.circular(10),
                             ),
                             border: Border.all(
-                              color: notifire.blueColor.withOpacity(0.1),
+                              color: CustomColor.blueColor.withOpacity(0.1),
                             ),
                           ),
                           child: Column(
@@ -345,7 +343,7 @@ class _Business2CustomerState extends State<Business2Customer> {
                                     width: width / 20,
                                   ),
                                   Text(
-                                    "Enter amount",
+                                    "Enter amount.",
                                     style: TextStyle(
                                       fontFamily: 'Gilroy Medium',
                                       fontSize: height / 50,
@@ -357,7 +355,7 @@ class _Business2CustomerState extends State<Business2Customer> {
                                 padding: EdgeInsets.only(left: width / 20),
                                 child: TextFormField(
                                   style: TextStyle(
-                                      color: notifire.getdarkscolor,
+                                      color: CustomColor.getdarkcolor,
                                       fontSize: height / 40),
                                   cursorColor: Colors.black,
                                   keyboardType: TextInputType.number,
@@ -378,7 +376,7 @@ class _Business2CustomerState extends State<Business2Customer> {
                                       hintText: "KES 0",
                                       hintStyle: TextStyle(
                                           fontSize: height / 30,
-                                          color: notifire.getdarkscolor
+                                          color: CustomColor.getdarkcolor
                                               .withOpacity(0.4),
                                           fontFamily: 'Gilroy Bold')),
                                 ),
@@ -404,11 +402,11 @@ class _Business2CustomerState extends State<Business2Customer> {
                             },
                             style: TextStyle(
                               fontSize: height / 50,
-                              color: notifire.getdarkscolor,
+                              color: CustomColor.getdarkcolor,
                             ),
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: notifire.getdarkwhitecolor,
+                              fillColor: CustomColor.getdarkwhitecolor,
                               hintText: "Reason(optional)",
                               hintStyle: TextStyle(
                                   color: Colors.grey, fontSize: height / 60),
