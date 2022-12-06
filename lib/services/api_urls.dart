@@ -17,4 +17,5 @@ class ApiUrls {
 
   static String PROCESS_PAYMENT_URL = "payments/process-payment/";
   static String BUSINESS_2_CUSTOMER_URL = "payments/b2c/";
+  static String GET_BANK_CODES_URL = "waas/channel-codes/";
 }

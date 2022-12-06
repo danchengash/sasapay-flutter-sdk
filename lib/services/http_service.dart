@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:sasapay_sdk/services/api_urls.dart';
 import 'package:sasapay_sdk/services/custom_logger.dart';
-import 'package:sasapay_sdk/utils/helper_enums.dart';
+import 'package:sasapay_sdk/utils/helper_enums_consts.dart';
 
 enum Method { POST, GET, PUT, DELETE, PATCH }
 
@@ -106,7 +106,7 @@ class DiohttpService {
     ///Basically merges the various components of the provided params
     ///to generate one link for getting credentials before placing a request.
 
-    final url = environmentMode == Environment.Live
+    final url = environmentMode == EnvironmentSasaPay.Live
         ? ApiUrls.BASE_URL_PRODUCTION
         : ApiUrls.BASE_URL_TESTING;
     final uri = Uri.parse(url + ApiUrls.TOKE_AUTH_URL);
