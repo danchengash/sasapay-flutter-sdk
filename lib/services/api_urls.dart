@@ -23,4 +23,5 @@ class ApiUrls {
   static String QUERY_MERCHANT_ACCOUNT_BALANCE_URL =
       "payments/check-balance/?MerchantCode=";
   static String CHECK_TRANSACTION_STATUS_URL = "transactions/status/";
+  static String VERIFY_TRANSACTION_URL = "transactions/verify/";
 }
