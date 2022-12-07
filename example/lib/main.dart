@@ -1,5 +1,7 @@
 import 'package:example/helpers/custom_button.dart';
+import 'package:example/screens/business_to_business.dart';
 import 'package:example/screens/business_to_customer.dart';
+import 'package:example/screens/check_transaction.dart';
 import 'package:example/screens/customer_to_business.dart';
 import 'package:example/utils/init_services.dart';
 import 'package:example/utils/utils_helpers.dart';
@@ -54,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     var resp = await sasaPay.registerConfirmationUrl(
-      merchantCode: 600980.toString(),
+      merchantCode: MERCHANT_CODE,
       confirmationCallbackURL: CALL_BACK_URL,
     );
 
@@ -94,9 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   CustomElevatedButton(
                     onPressed: () {
                       Get.to(
-                        () => Customer2Business(
-                          sasaPay: sasaPay,
-                        ),
+                        () => Customer2Business(),
                       );
                     },
                     label: "CUSTOMER to Business.",
@@ -107,12 +107,51 @@ class _MyHomePageState extends State<MyHomePage> {
                   CustomElevatedButton(
                     onPressed: () {
                       Get.to(
-                        () => Business2Customer(
-                          sasaPay: sasaPay,
-                        ),
+                        () => Business2Customer(),
                       );
                     },
                     label: "BUSINESS to Customer.",
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => Business2Business(),
+                      );
+                    },
+                    label: "BUSINESS to BUSINESS.",
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                      label: "Get Merchant Account Balance.",
+                      onPressed: () async {
+                        setState(() {
+                          loading = true;
+                          response = {"Getting account balance...": "...."};
+                        });
+
+                        var resp = await sasaPay.queryMerchantAccountBalance(
+                            merchantCode: MERCHANT_CODE);
+
+                        setState(() {
+                          response = resp?.data;
+                          loading = false;
+                        });
+                      }),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => CheckTransaction(),
+                      );
+                    },
+                    label: "CHECK transaction Status.",
                   ),
                   const SizedBox(
                     height: 20,
@@ -136,8 +175,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             SasaPay.getBanksCodes();
                         setState(() {
                           loading = false;
-                          response = Map.fromIterable(result,
-                              key: (v) => v.bankName, value: (v) => v.bankCode);
+                          response = Map.fromIterable(
+                            result,
+                            key: (v) => v.bankName,
+                            value: (v) => v.bankCode,
+                          );
                           ;
                         });
                       }),
