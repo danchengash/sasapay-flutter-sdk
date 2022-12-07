@@ -206,6 +206,29 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                       }),
                   const SizedBox(
+                    height: 10,
+                  ),
+                  Divider(
+                    color: CustomColor.blueColor,
+                    thickness: 2,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => VerifyTransaction(),
+                      );
+                    },
+                    label: "UTILITIES.",
+                    gradient: LinearGradient(colors: [
+                      Color.fromARGB(255, 13, 103, 167),
+                      Color(0xff005492),
+                      Color(0xff003359),
+                    ]),
+                  ),
+                  const SizedBox(
                     height: 30,
                   ),
                   JsonView.map(response),
