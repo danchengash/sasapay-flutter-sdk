@@ -31,7 +31,7 @@ class CustomElevatedButton extends StatelessWidget {
     final borderRadius = this.borderRadius ?? BorderRadius.circular(18);
     return Material(
       borderRadius: borderRadius,
-      elevation: 7,
+      elevation: 14,
       child: InkWell(
         onTap: () {
           onPressed!();
@@ -42,9 +42,13 @@ class CustomElevatedButton extends StatelessWidget {
           padding: const EdgeInsets.all(5),
           height: height,
           decoration: BoxDecoration(
-            gradient: gradient,
-            borderRadius: borderRadius,
-          ),
+              gradient: gradient,
+              borderRadius: borderRadius,
+              border: Border.all(
+                color: Colors.white,
+                strokeAlign: StrokeAlign.outside,
+                width: 0.2,
+              )),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
