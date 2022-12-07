@@ -171,6 +171,84 @@ class SasaPay {
     return response;
   }
 
+  Future<Response?> business2Beneficiary({
+    required String senderMerchantCode,
+    required String receiverMerchantCode,
+    required String beneficiaryAccountNumber,
+    required double amount,
+    required double transactionFee,
+    String? transactionreason,
+    String? transactiontReference,
+    required String callBackURL,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.BUSINES_2_BENEFICIARY_URL,
+      method: Method.POST,
+      params: {
+        "TransactionReference": transactiontReference,
+        "SenderMerchantCode": senderMerchantCode,
+        "ReceiverMerchantCode": receiverMerchantCode,
+        "BeneficiaryAccountNumber": beneficiaryAccountNumber,
+        "Amount": amount,
+        "TransactionFee": transactionFee,
+        "Reason": transactionreason,
+        "CallBackUrl": callBackURL,
+      },
+    );
+
+    return response;
+  }
+
+  Future<Response?> business2Business({
+    required String merchantCode,
+    required String receiverMerchantCode,
+    required double amount,
+    String? transactionreason,
+    String? transactiontReference,
+    required String callBackURL,
+  }) async {
+    Response? response = await httpService?.request(
+        url: ApiUrls.BUSINESS_2_BUSINESS_URL,
+        method: Method.POST,
+        params: {
+          "MerchantCode": merchantCode,
+          "MerchantTransactionReference": transactiontReference,
+          "Currency": "KES",
+          "Amount": amount,
+          "ReceiverMerchantCode": receiverMerchantCode,
+          "CallBackURL": callBackURL,
+          "Reason": transactionreason
+        });
+
+    return response;
+  }
+
+  Future<Response?> queryMerchantAccountBalance({
+    required String merchantCode,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.QUERY_MERCHANT_ACCOUNT_BALANCE_URL + merchantCode,
+      method: Method.GET,
+    );
+
+    return response;
+  }
+
+  Future<Response?> checkTransactionStatus({
+    required String merchantCode,
+    required String checkoutId,
+  }) async {
+    Response? response = await httpService?.request(
+        url: ApiUrls.CHECK_TRANSACTION_STATUS_URL,
+        method: Method.POST,
+        params: {
+          "MerchantCode": merchantCode,
+          "CheckoutRequestId":checkoutId
+        });
+
+    return response;
+  }
+
   /// Get the matching network codes of each service provider
   static int? getNetworkCode({required String networkTitle}) {
     //remove spaces, dashes,fullstops,trim the string then to lowercase
