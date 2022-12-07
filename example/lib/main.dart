@@ -1,8 +1,10 @@
 import 'package:example/helpers/custom_button.dart';
+import 'package:example/helpers/themes_colors.dart';
 import 'package:example/screens/business_to_business.dart';
 import 'package:example/screens/business_to_customer.dart';
 import 'package:example/screens/check_transaction.dart';
 import 'package:example/screens/customer_to_business.dart';
+import 'package:example/screens/verify_transaction.dart';
 import 'package:example/utils/init_services.dart';
 import 'package:example/utils/utils_helpers.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +73,10 @@ class _MyHomePageState extends State<MyHomePage> {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: CustomColor.blueColor.withOpacity(0.7),
       appBar: AppBar(
+        backgroundColor: CustomColor.appBarColor,
+        centerTitle: true,
         title: Text(widget.title),
       ),
       body: Center(
@@ -127,21 +132,27 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: 20,
                   ),
                   CustomElevatedButton(
-                      label: "Get Merchant Account Balance.",
-                      onPressed: () async {
-                        setState(() {
-                          loading = true;
-                          response = {"Getting account balance...": "...."};
-                        });
+                    label: "Get Merchant Account Balance.",
+                    onPressed: () async {
+                      setState(() {
+                        loading = true;
+                        response = {"Getting account balance...": "...."};
+                      });
 
-                        var resp = await sasaPay.queryMerchantAccountBalance(
-                            merchantCode: MERCHANT_CODE);
+                      var resp = await sasaPay.queryMerchantAccountBalance(
+                          merchantCode: MERCHANT_CODE);
 
-                        setState(() {
-                          response = resp?.data;
-                          loading = false;
-                        });
-                      }),
+                      setState(() {
+                        response = resp?.data;
+                        loading = false;
+                      });
+                    },
+                    gradient: LinearGradient(colors: [
+                      Color.fromARGB(255, 13, 103, 167),
+                      Color(0xff005492),
+                      Color(0xff003359),
+                    ]),
+                  ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -152,6 +163,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       );
                     },
                     label: "CHECK transaction Status.",
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => VerifyTransaction(),
+                      );
+                    },
+                    label: "Verify a transaction.",
                   ),
                   const SizedBox(
                     height: 20,
