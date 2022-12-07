@@ -243,8 +243,21 @@ class SasaPay {
         method: Method.POST,
         params: {
           "MerchantCode": merchantCode,
-          "CheckoutRequestId":checkoutId
+          "CheckoutRequestId": checkoutId
         });
+
+    return response;
+  }
+
+  Future<Response?> verifyTransaction({
+    required String merchantCode,
+    required String transactioncode,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.VERIFY_TRANSACTION_URL,
+      method: Method.POST,
+      params: {"MerchantCode": merchantCode, "TransactionCode": transactioncode},
+    );
 
     return response;
   }
