@@ -14,9 +14,7 @@ import 'package:sasapay_sdk/helper_functions.dart';
 import 'package:sasapay_sdk/initialize_sdk.dart';
 
 class Customer2Business extends StatefulWidget {
-  Customer2Business({required this.sasaPay, Key? key}) : super(key: key);
-
-  SasaPay sasaPay;
+  Customer2Business({Key? key}) : super(key: key);
 
   @override
   State<Customer2Business> createState() => _Customer2BusinessState();
@@ -29,6 +27,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
   TextEditingController reasonController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
+  SasaPay sasaPay = Get.find<SasaPay>();
 
   int? networkcode;
   Map<String, dynamic> response = {};
@@ -435,7 +434,8 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                     });
                                     final amount =
                                         double.tryParse(amountController.text);
-                                    var resp = await widget.sasaPay
+
+                                    var resp = await sasaPay
                                         .customer2BusinessPhoneNumber(
                                             merchantCode: MERCHANT_CODE,
                                             networkCode: networkcode.toString(),
