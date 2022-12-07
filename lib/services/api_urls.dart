@@ -18,4 +18,9 @@ class ApiUrls {
   static String PROCESS_PAYMENT_URL = "payments/process-payment/";
   static String BUSINESS_2_CUSTOMER_URL = "payments/b2c/";
   static String GET_BANK_CODES_URL = "waas/channel-codes/";
+  static String BUSINES_2_BENEFICIARY_URL = "payments/b2c/beneficiary/";
+  static String BUSINESS_2_BUSINESS_URL = "payments/b2b/";
+  static String QUERY_MERCHANT_ACCOUNT_BALANCE_URL =
+      "payments/check-balance/?MerchantCode=";
+  static String CHECK_TRANSACTION_STATUS_URL = "transactions/status/";
 }
