@@ -159,7 +159,7 @@ class _CheckTransactionState extends State<CheckTransaction> {
                                     var resp =
                                         await sasaPay.checkTransactionStatus(
                                       merchantCode: MERCHANT_CODE,
-                                      checkoutId: transIdController.text,
+                                      checkoutId: transIdController.text.trim(),
                                     );
 
                                     setState(() {
