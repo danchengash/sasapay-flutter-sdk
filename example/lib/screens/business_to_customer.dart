@@ -15,9 +15,7 @@ import 'package:sasapay_sdk/initialize_sdk.dart';
 import 'package:sasapay_sdk/models/bank_model.dart';
 
 class Business2Customer extends StatefulWidget {
-  Business2Customer({required this.sasaPay, Key? key}) : super(key: key);
-
-  SasaPay sasaPay;
+  Business2Customer({Key? key}) : super(key: key);
 
   @override
   State<Business2Customer> createState() => _Business2CustomerState();
@@ -30,6 +28,7 @@ class _Business2CustomerState extends State<Business2Customer> {
   TextEditingController reasonController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
+  SasaPay sasaPay = Get.find<SasaPay>();
 
   int? networkcode;
   Map<String, dynamic> response = {};
@@ -445,18 +444,15 @@ class _Business2CustomerState extends State<Business2Customer> {
                                     });
                                     final amount =
                                         double.tryParse(amountController.text);
-                                    var resp = await widget.sasaPay
-                                        .customer2BusinessPhoneNumber(
-                                            merchantCode: MERCHANT_CODE,
-                                            networkCode: networkcode.toString(),
-                                            transactionDesc:
-                                                reasonController.text,
-                                            phoneNumber:
-                                                phoneNumberController.text,
-                                            accountReference:
-                                                phoneNumberController.text,
-                                            amount: amount!,
-                                            callBackURL: CALL_BACK_URL);
+                                    var resp = await sasaPay.business2Customer(
+                                        merchantCode: MERCHANT_CODE,
+                                        amount: amount!,
+                                        receiverNumber:phoneNumberController.text,
+                                        channelCode: selectedBank!.bankCode,
+                                        callBackURL: CALL_BACK_URL,
+                                        transactionDesc: selectedReason,
+                                        accountReference:phoneNumberController.text,);
+
                                     setState(() {
                                       loading = false;
                                       response = resp?.data;
