@@ -147,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         loading = false;
                       });
                     },
-                    gradient: LinearGradient(colors: [
+                    gradient: const LinearGradient(colors: [
                       Color.fromARGB(255, 13, 103, 167),
                       Color(0xff005492),
                       Color(0xff003359),
@@ -222,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       );
                     },
                     label: "UTILITIES.",
-                    gradient: LinearGradient(colors: [
+                    gradient: const LinearGradient(colors: [
                       Color.fromARGB(255, 13, 103, 167),
                       Color(0xff005492),
                       Color(0xff003359),

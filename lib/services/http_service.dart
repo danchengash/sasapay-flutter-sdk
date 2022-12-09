@@ -109,7 +109,7 @@ class DiohttpService {
     final url = environmentMode == EnvironmentSasaPay.Live
         ? ApiUrls.BASE_URL_PRODUCTION
         : ApiUrls.BASE_URL_TESTING;
-    final uri = Uri.parse(url + ApiUrls.TOKE_AUTH_URL);
+    final uri = Uri.parse(url + ApiUrls.TOKEN_AUTH_URL);
     return uri;
   }
 
