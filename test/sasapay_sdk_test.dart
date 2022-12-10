@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sasapay_sdk/initialize_sdk.dart';
 
 import 'package:sasapay_sdk/sasapay_sdk.dart';
-import 'package:sasapay_sdk/utils/helper_enums.dart';
+import 'package:sasapay_sdk/utils/helper_enums_consts.dart';
 
 void main() {
   testWidgets('failing test example', (tester) async {

@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
+import 'package:sasapay_sdk/models/bank_model.dart';
 import 'package:sasapay_sdk/services/api_urls.dart';
 import 'package:sasapay_sdk/services/http_service.dart';
-import 'package:sasapay_sdk/utils/helper_enums.dart';
+import 'package:sasapay_sdk/utils/helper_enums_consts.dart';
 
 /// Initializes a new instance of [SasaPay]
 /// Requires 3 parameters:
@@ -20,14 +23,14 @@ class SasaPay {
   final String clientSecret;
 
   /// Environment the app is running on. It can either be `sandbox` or `production`
-  final Environment environment;
+  final EnvironmentSasaPay environment;
 
   SasaPay(
       {required this.clientId,
       required this.clientSecret,
       required this.environment}) {
     httpService = DiohttpService(
-      baseUrl: environment == Environment.Live
+      baseUrl: environment == EnvironmentSasaPay.Live
           ? ApiUrls.BASE_URL_PRODUCTION
           : ApiUrls.BASE_URL_TESTING,
       consumerId: clientId.trim(),
@@ -36,7 +39,7 @@ class SasaPay {
     httpService?.initializeDio();
     environmentMode = environment;
   }
-  DiohttpService? httpService;
+  static DiohttpService? httpService;
 
   Future<Response?> registerConfirmationUrl(
       {required String merchantCode,
@@ -91,7 +94,170 @@ class SasaPay {
         "CallBackURL": callBackURL
       },
     );
-  
+
+    return response;
+  }
+
+  Future<Response?> customer2BusinessAliasNumber({
+    required String merchantCode,
+
+    /// SasaPay(0) 63902(MPesa) 63903(AirtelMoney) 63907(T-Kash)
+    required String networkCode,
+    required String aliasNumber,
+    String? transactionDesc,
+    String? accountReference,
+    required double amount,
+    required String callBackURL,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.CUSTOMER_2_BUSINESS_Alias_URL,
+      method: Method.POST,
+      params: {
+        "MerchantCode": merchantCode,
+        "NetworkCode": networkCode,
+        "AliasNumber": aliasNumber,
+        "TransactionDesc": transactionDesc ?? '',
+        "AccountReference": accountReference ?? '',
+        "Currency": "KES",
+        "Amount": amount,
+        "CallBackURL": callBackURL
+      },
+    );
+
+    return response;
+  }
+
+  Future<Response?> processC2Bpayment({
+    required String merchantCode,
+    required String checkoutRequestID,
+    required String verificationCode,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.PROCESS_PAYMENT_URL,
+      method: Method.POST,
+      params: {
+        "CheckoutRequestID": checkoutRequestID,
+        "MerchantCode": merchantCode,
+        "VerificationCode": verificationCode
+      },
+    );
+
+    return response;
+  }
+
+  Future<Response?> business2Customer({
+    required String merchantCode,
+    required double amount,
+    required String receiverNumber,
+    required String channelCode,
+    String? transactionDesc,
+    String? accountReference,
+    required String callBackURL,
+  }) async {
+    Response? response = await httpService?.request(
+        url: ApiUrls.BUSINESS_2_CUSTOMER_URL,
+        method: Method.POST,
+        params: {
+          "MerchantCode": merchantCode,
+          "MerchantTransactionReference": accountReference,
+          "Amount": amount,
+          "Currency": "KES",
+          "ReceiverNumber": receiverNumber,
+          "Channel": channelCode,
+          "Reason": transactionDesc,
+          "CallBackURL": callBackURL
+        });
+
+    return response;
+  }
+
+  Future<Response?> business2Beneficiary({
+    required String senderMerchantCode,
+    required String receiverMerchantCode,
+    required String beneficiaryAccountNumber,
+    required double amount,
+    required double transactionFee,
+    String? transactionreason,
+    String? transactiontReference,
+    required String callBackURL,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.BUSINES_2_BENEFICIARY_URL,
+      method: Method.POST,
+      params: {
+        "TransactionReference": transactiontReference,
+        "SenderMerchantCode": senderMerchantCode,
+        "ReceiverMerchantCode": receiverMerchantCode,
+        "BeneficiaryAccountNumber": beneficiaryAccountNumber,
+        "Amount": amount,
+        "TransactionFee": transactionFee,
+        "Reason": transactionreason,
+        "CallBackUrl": callBackURL,
+      },
+    );
+
+    return response;
+  }
+
+  Future<Response?> business2Business({
+    required String merchantCode,
+    required String receiverMerchantCode,
+    required double amount,
+    String? transactionreason,
+    String? transactiontReference,
+    required String callBackURL,
+  }) async {
+    Response? response = await httpService?.request(
+        url: ApiUrls.BUSINESS_2_BUSINESS_URL,
+        method: Method.POST,
+        params: {
+          "MerchantCode": merchantCode,
+          "MerchantTransactionReference": transactiontReference,
+          "Currency": "KES",
+          "Amount": amount,
+          "ReceiverMerchantCode": receiverMerchantCode,
+          "CallBackURL": callBackURL,
+          "Reason": transactionreason
+        });
+
+    return response;
+  }
+
+  Future<Response?> queryMerchantAccountBalance({
+    required String merchantCode,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.QUERY_MERCHANT_ACCOUNT_BALANCE_URL + merchantCode,
+      method: Method.GET,
+    );
+
+    return response;
+  }
+
+  Future<Response?> checkTransactionStatus({
+    required String merchantCode,
+    required String checkoutId,
+  }) async {
+    Response? response = await httpService?.request(
+        url: ApiUrls.CHECK_TRANSACTION_STATUS_URL,
+        method: Method.POST,
+        params: {
+          "MerchantCode": merchantCode,
+          "CheckoutRequestId": checkoutId
+        });
+
+    return response;
+  }
+
+  Future<Response?> verifyTransaction({
+    required String merchantCode,
+    required String transactioncode,
+  }) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.VERIFY_TRANSACTION_URL,
+      method: Method.POST,
+      params: {"MerchantCode": merchantCode, "TransactionCode": transactioncode},
+    );
 
     return response;
   }
@@ -120,4 +286,31 @@ class SasaPay {
         return null;
     }
   }
+
+  static List<BanksChannelCode?> getBanksCodes() {
+    List<BanksChannelCode> banks = [];
+    for (var element in kbanksCodesSasapay) {
+      banks.add(BanksChannelCode.fromJson(element));
+    }
+
+    return banks;
+  }
+
+  // static Future<BankModel?> getBanksCodes() async {
+  //   BankModel? bankModel;
+
+  //   final resp = await httpService?.request(
+  //     url: ApiUrls.GET_BANK_CODES_URL,
+  //     method: Method.GET,
+  //   );
+  //   if (resp != null) {
+  //     Map<String, dynamic> result = jsonDecode(resp.toString());
+  //     if (result["status"] == "0") {
+  //       return BankModel.fromJson(result);
+  //     }
+  //   } else {
+  //     return bankModel;
+  //   }
+  //   return null;
+  // }
 }

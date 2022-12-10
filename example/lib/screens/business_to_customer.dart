@@ -12,15 +12,16 @@ import 'package:get/get.dart';
 import 'package:select_card/select_card.dart';
 import 'package:sasapay_sdk/helper_functions.dart';
 import 'package:sasapay_sdk/initialize_sdk.dart';
+import 'package:sasapay_sdk/models/bank_model.dart';
 
-class Customer2Business extends StatefulWidget {
-  Customer2Business({Key? key}) : super(key: key);
+class Business2Customer extends StatefulWidget {
+  Business2Customer({Key? key}) : super(key: key);
 
   @override
-  State<Customer2Business> createState() => _Customer2BusinessState();
+  State<Business2Customer> createState() => _Business2CustomerState();
 }
 
-class _Customer2BusinessState extends State<Customer2Business> {
+class _Business2CustomerState extends State<Business2Customer> {
   int _selectedIndex = 0;
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController amountController = TextEditingController();
@@ -32,17 +33,14 @@ class _Customer2BusinessState extends State<Customer2Business> {
   int? networkcode;
   Map<String, dynamic> response = {};
 
-  List<String?> images = [
-    "assets/images/sasapay.png",
-    "assets/images/mpesa_icon.png",
-    "assets/images/airtel_money.jpeg",
-    "assets/images/t_kash.png",
-  ];
+  List<BanksChannelCode?> banks = [];
+  BanksChannelCode? selectedBank;
 
   bool loading = false;
 
   @override
   void initState() {
+    banks = SasaPay.getBanksCodes();
     super.initState();
   }
 
@@ -81,7 +79,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                             ),
                             const Spacer(),
                             Text(
-                              "Customer to business transfer",
+                              "Business to Customer transfer",
                               style: TextStyle(
                                   fontSize: height / 45,
                                   fontFamily: 'Gilroy Bold'),
@@ -112,39 +110,51 @@ class _Customer2BusinessState extends State<Customer2Business> {
                       SizedBox(
                         height: height / 60,
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: width / 43),
-                        child: SizedBox(
-                          width: width / 0.35,
-                          child: SelectGroupCard(context,
-                              titles: const [
-                                "Sasa Pay",
-                                "Mpesa",
-                                "Airtel",
-                                "Tkash"
-                              ],
-                              imageSourceType: ImageSourceType.asset,
-                              images: images,
-                              contents: const [
-                                "Sasa Pay",
-                                "Mpesa",
-                                "Airtel",
-                                "Tkash"
-                              ],
-                              cardBackgroundColor:
-                                  const Color.fromARGB(255, 135, 200, 246),
-                              cardSelectedColor:
-                                  const Color.fromARGB(255, 172, 0, 32),
-                              titleTextColor:
-                                  const Color.fromARGB(255, 0, 15, 28),
-                              contentTextColor: Colors.black87, onTap: (title) {
-                            setState(() {
-                              networkcode =
-                                  SasaPay.getNetworkCode(networkTitle: title);
-                            });
+                      Container(
+                        height: height / 17,
+                        width: width / 1.12,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.grey.withOpacity(0.3),
+                          ),
+                        ),
+                        child: DropdownButton(
+                          underline: const SizedBox(),
+                          value: selectedBank,
+                          icon: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              SizedBox(width: width / 4),
+                              Icon(
+                                Icons.arrow_drop_down_outlined,
+                                color: CustomColor.getdarkcolor,
+                              ),
+                            ],
+                          ),
 
-                            debugPrint(networkcode.toString());
-                          }),
+                          // Array list of items
+                          items: banks.map((docitems) {
+                            return DropdownMenuItem(
+                              value: docitems,
+                              child: Row(
+                                children: [
+                                  SizedBox(width: width / 50),
+                                  Text(
+                                    docitems!.bankName,
+                                    style: TextStyle(fontSize: height / 60),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          // After selecting the desired option,it will
+                          // change button value to selected value
+                          onChanged: (newValue) {
+                            setState(() {
+                              selectedBank = newValue;
+                            });
+                          },
                         ),
                       ),
                       SizedBox(
@@ -332,7 +342,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                     width: width / 20,
                                   ),
                                   Text(
-                                    "Enter amount",
+                                    "Enter amount.",
                                     style: TextStyle(
                                       fontFamily: 'Gilroy Medium',
                                       fontSize: height / 50,
@@ -434,19 +444,15 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                     });
                                     final amount =
                                         double.tryParse(amountController.text);
+                                    var resp = await sasaPay.business2Customer(
+                                        merchantCode: MERCHANT_CODE,
+                                        amount: amount!,
+                                        receiverNumber:phoneNumberController.text,
+                                        channelCode: selectedBank!.bankCode,
+                                        callBackURL: CALL_BACK_URL,
+                                        transactionDesc: selectedReason,
+                                        accountReference:phoneNumberController.text,);
 
-                                    var resp = await sasaPay
-                                        .customer2BusinessPhoneNumber(
-                                            merchantCode: MERCHANT_CODE,
-                                            networkCode: networkcode.toString(),
-                                            transactionDesc:
-                                                reasonController.text,
-                                            phoneNumber:
-                                                phoneNumberController.text,
-                                            accountReference:
-                                                phoneNumberController.text,
-                                            amount: amount!,
-                                            callBackURL: CALL_BACK_URL);
                                     setState(() {
                                       loading = false;
                                       response = resp?.data;

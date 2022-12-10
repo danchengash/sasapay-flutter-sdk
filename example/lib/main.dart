@@ -1,12 +1,21 @@
 import 'package:example/helpers/custom_button.dart';
+import 'package:example/helpers/themes_colors.dart';
+import 'package:example/screens/business_to_business.dart';
+import 'package:example/screens/business_to_customer.dart';
+import 'package:example/screens/check_transaction.dart';
 import 'package:example/screens/customer_to_business.dart';
+import 'package:example/screens/verify_transaction.dart';
+import 'package:example/utils/init_services.dart';
+import 'package:example/utils/utils_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:get/get.dart';
 import 'package:sasapay_sdk/sasapay_sdk.dart';
-import 'package:sasapay_sdk/utils/helper_enums.dart';
+import 'package:sasapay_sdk/utils/helper_enums_consts.dart';
+import 'package:sasapay_sdk/models/bank_model.dart';
 
-void main() {
+void main() async {
+  sasaPayServicesInit();
   runApp(const MyApp());
 }
 
@@ -38,24 +47,19 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  SasaPay sasaPay = SasaPay(
-    clientId: "8mgx3sf4QhfZpN7aG9DIVdrrMVyTFxU89gz5gaur",
-    clientSecret:
-        "EWbIcQEhd3acV8vcAAyuldKpp2EaWNpda4GfQHuANW5biExHDLcGLuxJ6BV1UgHNODfXUUsQqwHBSlc9KINFofXQjQ7DuqI124aICYjsz5MiGn5KajTA8F1YbOQMhHtM",
-    environment: Environment.Testing,
-  );
+  SasaPay sasaPay = Get.find<SasaPay>();
 
   Map<String, dynamic> response = {};
   bool loading = false;
   registerConfirmationUrl() async {
     setState(() {
       loading = true;
-      response = {"Registering call back url...": "s"};
+      response = {"Registering call back url...": "...."};
     });
 
     var resp = await sasaPay.registerConfirmationUrl(
-      merchantCode: 600980.toString(),
-      confirmationCallbackURL: "https://6fb9-41-90-115-26.eu.ngrok.io",
+      merchantCode: MERCHANT_CODE,
+      confirmationCallbackURL: CALL_BACK_URL,
     );
 
     setState(() {
@@ -66,41 +70,174 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: CustomColor.blueColor.withOpacity(0.7),
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
+        backgroundColor: CustomColor.appBarColor,
+        centerTitle: true,
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              CustomElevatedButton(
-                onPressed: () {
-                  Get.to(() => Customer2Business(
-                        sasaPay: sasaPay,
-                      ));
-                },
-                label: "Customer to Business",
+        child: SingleChildScrollView(
+          child: SizedBox(
+            height: height * 1.2,
+            width: width,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Visibility(
+                      visible: loading,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => Customer2Business(),
+                      );
+                    },
+                    label: "CUSTOMER to Business.",
+                  ),
+                  SizedBox(
+                    height: height / 33,
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => Business2Customer(),
+                      );
+                    },
+                    label: "BUSINESS to Customer.",
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => Business2Business(),
+                      );
+                    },
+                    label: "BUSINESS to BUSINESS.",
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                    label: "Get Merchant Account Balance.",
+                    onPressed: () async {
+                      setState(() {
+                        loading = true;
+                        response = {"Getting account balance...": "...."};
+                      });
+
+                      var resp = await sasaPay.queryMerchantAccountBalance(
+                          merchantCode: MERCHANT_CODE);
+
+                      setState(() {
+                        response = resp?.data;
+                        loading = false;
+                      });
+                    },
+                    gradient: const LinearGradient(colors: [
+                      Color.fromARGB(255, 13, 103, 167),
+                      Color(0xff005492),
+                      Color(0xff003359),
+                    ]),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => CheckTransaction(),
+                      );
+                    },
+                    label: "CHECK transaction Status.",
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => VerifyTransaction(),
+                      );
+                    },
+                    label: "Verify a transaction.",
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                      label: "Register confirmation url",
+                      onPressed: () {
+                        registerConfirmationUrl();
+                      }),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  CustomElevatedButton(
+                      label: "Get bank channel codes",
+                      onPressed: () async {
+                        setState(() {
+                          loading = true;
+                          response = {"Getting bank codes": "...."};
+                        });
+                        List<BanksChannelCode?> result =
+                            SasaPay.getBanksCodes();
+                        setState(() {
+                          loading = false;
+                          response = Map.fromIterable(
+                            result,
+                            key: (v) => v.bankName,
+                            value: (v) => v.bankCode,
+                          );
+                          ;
+                        });
+                      }),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Divider(
+                    color: CustomColor.blueColor,
+                    thickness: 2,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  CustomElevatedButton(
+                    onPressed: () {
+                      Get.to(
+                        () => VerifyTransaction(),
+                      );
+                    },
+                    label: "UTILITIES.",
+                    gradient: const LinearGradient(colors: [
+                      Color.fromARGB(255, 13, 103, 167),
+                      Color(0xff005492),
+                      Color(0xff003359),
+                    ]),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  JsonView.map(response),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                ],
               ),
-              SizedBox(
-                height: 20,
-              ),
-              CustomElevatedButton(
-                  label: "Reg confirmation url",
-                  onPressed: () {
-                    registerConfirmationUrl();
-                  }),
-              SizedBox(
-                height: 30,
-              ),
-              JsonView.map(response),
-            ],
+            ),
           ),
         ),
       ),
@@ -108,7 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () async {
           final resp = await sasaPay.registerConfirmationUrl(
             merchantCode: 600980.toString(),
-            confirmationCallbackURL: "https://5ee1-41-90-115-26.eu.ngrok.io",
+            confirmationCallbackURL: CALL_BACK_URL,
           );
           print(resp);
           setState(() {

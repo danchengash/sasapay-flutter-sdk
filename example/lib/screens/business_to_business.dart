@@ -12,17 +12,18 @@ import 'package:get/get.dart';
 import 'package:select_card/select_card.dart';
 import 'package:sasapay_sdk/helper_functions.dart';
 import 'package:sasapay_sdk/initialize_sdk.dart';
+import 'package:sasapay_sdk/models/bank_model.dart';
 
-class Customer2Business extends StatefulWidget {
-  Customer2Business({Key? key}) : super(key: key);
+class Business2Business extends StatefulWidget {
+  Business2Business({Key? key}) : super(key: key);
 
   @override
-  State<Customer2Business> createState() => _Customer2BusinessState();
+  State<Business2Business> createState() => _Business2BusinessState();
 }
 
-class _Customer2BusinessState extends State<Customer2Business> {
+class _Business2BusinessState extends State<Business2Business> {
   int _selectedIndex = 0;
-  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController recepientController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   TextEditingController reasonController = TextEditingController();
 
@@ -32,17 +33,14 @@ class _Customer2BusinessState extends State<Customer2Business> {
   int? networkcode;
   Map<String, dynamic> response = {};
 
-  List<String?> images = [
-    "assets/images/sasapay.png",
-    "assets/images/mpesa_icon.png",
-    "assets/images/airtel_money.jpeg",
-    "assets/images/t_kash.png",
-  ];
+  List<BanksChannelCode?> banks = [];
+  BanksChannelCode? selectedBank;
 
   bool loading = false;
 
   @override
   void initState() {
+    banks = SasaPay.getBanksCodes();
     super.initState();
   }
 
@@ -81,7 +79,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                             ),
                             const Spacer(),
                             Text(
-                              "Customer to business transfer",
+                              "Business to Business transfer",
                               style: TextStyle(
                                   fontSize: height / 45,
                                   fontFamily: 'Gilroy Bold'),
@@ -112,58 +110,6 @@ class _Customer2BusinessState extends State<Customer2Business> {
                       SizedBox(
                         height: height / 60,
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: width / 43),
-                        child: SizedBox(
-                          width: width / 0.35,
-                          child: SelectGroupCard(context,
-                              titles: const [
-                                "Sasa Pay",
-                                "Mpesa",
-                                "Airtel",
-                                "Tkash"
-                              ],
-                              imageSourceType: ImageSourceType.asset,
-                              images: images,
-                              contents: const [
-                                "Sasa Pay",
-                                "Mpesa",
-                                "Airtel",
-                                "Tkash"
-                              ],
-                              cardBackgroundColor:
-                                  const Color.fromARGB(255, 135, 200, 246),
-                              cardSelectedColor:
-                                  const Color.fromARGB(255, 172, 0, 32),
-                              titleTextColor:
-                                  const Color.fromARGB(255, 0, 15, 28),
-                              contentTextColor: Colors.black87, onTap: (title) {
-                            setState(() {
-                              networkcode =
-                                  SasaPay.getNetworkCode(networkTitle: title);
-                            });
-
-                            debugPrint(networkcode.toString());
-                          }),
-                        ),
-                      ),
-                      SizedBox(
-                        height: height / 35,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: width / 18,
-                          ),
-                          Text(
-                            "Account Number",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: height / 50,
-                            ),
-                          ),
-                        ],
-                      ),
                       SizedBox(
                         height: height / 70,
                       ),
@@ -175,10 +121,10 @@ class _Customer2BusinessState extends State<Customer2Business> {
                           child: TextFormField(
                             autofocus: false,
                             keyboardType: TextInputType.number,
-                            controller: phoneNumberController,
+                            controller: recepientController,
                             validator: (v) {
-                              if (v!.length < 9) {
-                                return "Enter valid mobile number";
+                              if (v!.length < 1) {
+                                return "Enter valid merchant code";
                               } else {
                                 return null;
                               }
@@ -195,7 +141,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                   tooltip: "Pick from contacts.",
                                   icon: const Icon(Icons.search),
                                   onPressed: () async {
-                                    var number = phoneNumberController.text;
+                                    var number = recepientController.text;
                                     bool hasPermission =
                                         await FlutterContactPicker
                                             .hasPermission();
@@ -203,62 +149,26 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                       final PhoneContact contact =
                                           await FlutterContactPicker
                                               .pickPhoneContact();
-                                      var number =
-                                          contact.phoneNumber?.number ?? "";
-                                      if (contact.phoneNumber!.number!
-                                          .startsWith("+254")) {
-                                        formKey.currentState!.reset();
-                                        setState(() {
-                                          var numb = number.split("+254")[1];
-                                          numb = "0" + numb;
-                                          phoneNumberController.text =
-                                              numb.replaceAll(" ", "").trim();
-                                        });
-                                      } else {
-                                        formKey.currentState!.reset();
-                                        setState(() {
-                                          var numb = number
-                                              .replaceAll(" ", "")
-                                              .replaceAll("(", "")
-                                              .replaceAll(")", "")
-                                              .replaceAll("-", "");
-                                          phoneNumberController.text =
-                                              numb.trim();
-                                        });
-                                      }
+                                      recepientController.text =
+                                          contact.phoneNumber?.number?.trim() ??
+                                              "";
+                                      setState(() {});
                                     } else {
                                       await FlutterContactPicker
                                           .requestPermission();
                                       final PhoneContact contact =
                                           await FlutterContactPicker
                                               .pickPhoneContact();
-                                      if (contact.phoneNumber!.number!
-                                          .startsWith("+254")) {
-                                        formKey.currentState!.reset();
-                                        setState(() {
-                                          var numb = number.split("+254")[1];
-                                          numb = "0" + numb;
-                                          phoneNumberController.text =
-                                              numb.replaceAll(" ", "").trim();
-                                        });
-                                      } else {
-                                        formKey.currentState!.reset();
-                                        setState(() {
-                                          var numb = number
-                                              .replaceAll(" ", "")
-                                              .replaceAll("(", "")
-                                              .replaceAll(")", "")
-                                              .replaceAll("-", "");
-                                          phoneNumberController.text =
-                                              numb.trim();
-                                        });
-                                      }
+                                      recepientController.text =
+                                          contact.phoneNumber?.number?.trim() ??
+                                              "";
+                                      setState(() {});
                                     }
                                   },
                                 ),
                               ),
                               filled: true,
-                              hintText: "Enter Mobile Number",
+                              hintText: "Enter recepient merchant code.",
                               prefixIcon: Padding(
                                 padding: EdgeInsets.symmetric(
                                     vertical: height / 100,
@@ -332,7 +242,7 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                     width: width / 20,
                                   ),
                                   Text(
-                                    "Enter amount",
+                                    "Enter amount.",
                                     style: TextStyle(
                                       fontFamily: 'Gilroy Medium',
                                       fontSize: height / 50,
@@ -434,19 +344,18 @@ class _Customer2BusinessState extends State<Customer2Business> {
                                     });
                                     final amount =
                                         double.tryParse(amountController.text);
+                                    var resp = await sasaPay.business2Business(
+                                      merchantCode: MERCHANT_CODE,
+                                      amount: amount!,
+                                      receiverMerchantCode:
+                                          recepientController.text,
+                                          
+                                      transactionreason: selectedReason,
+                                      transactiontReference:
+                                          recepientController.text,
+                                      callBackURL: CALL_BACK_URL,
+                                    );
 
-                                    var resp = await sasaPay
-                                        .customer2BusinessPhoneNumber(
-                                            merchantCode: MERCHANT_CODE,
-                                            networkCode: networkcode.toString(),
-                                            transactionDesc:
-                                                reasonController.text,
-                                            phoneNumber:
-                                                phoneNumberController.text,
-                                            accountReference:
-                                                phoneNumberController.text,
-                                            amount: amount!,
-                                            callBackURL: CALL_BACK_URL);
                                     setState(() {
                                       loading = false;
                                       response = resp?.data;
@@ -463,20 +372,6 @@ class _Customer2BusinessState extends State<Customer2Business> {
                               }),
                               label: 'submit',
                             ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      Visibility(
-                        visible: showprocessPayment,
-                        child: CustomElevatedButton(
-                          onPressed: () {
-                            Get.to(() => ProcessPaymentPage(
-                                checkoutRequestId:
-                                    response["CheckoutRequestID"]));
-                          },
-                          label: "Process Payment",
-                        ),
-                      ),
                       const SizedBox(
                         height: 30,
                       ),
