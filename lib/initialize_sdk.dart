@@ -256,7 +256,32 @@ class SasaPay {
     Response? response = await httpService?.request(
       url: ApiUrls.VERIFY_TRANSACTION_URL,
       method: Method.POST,
-      params: {"MerchantCode": merchantCode, "TransactionCode": transactioncode},
+      params: {
+        "MerchantCode": merchantCode,
+        "TransactionCode": transactioncode
+      },
+    );
+
+    return response;
+  }
+
+  Future<Response?> purchaseAirtime(
+      {required String merchantCode,
+      required String phoneNumber,
+      required String networkProvider,
+      required int amount,
+      required String callbackUrl}) async {
+    Response? response = await httpService?.request(
+      url: ApiUrls.PURCHASE_AIRTIME_URL,
+      method: Method.POST,
+      params: {
+        "MerchantCode": merchantCode,
+        "NetworkProvider": networkProvider,
+        "CustomerMobile": phoneNumber,
+        "Currency": "KES",
+        "Amount": amount,
+        "CallBackUrl": callbackUrl
+      },
     );
 
     return response;
