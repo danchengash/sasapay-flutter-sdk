@@ -4,6 +4,7 @@ import 'package:example/screens/business_to_business.dart';
 import 'package:example/screens/business_to_customer.dart';
 import 'package:example/screens/check_transaction.dart';
 import 'package:example/screens/customer_to_business.dart';
+import 'package:example/screens/utilities/utilities_main.dart';
 import 'package:example/screens/verify_transaction.dart';
 import 'package:example/utils/init_services.dart';
 import 'package:example/utils/utils_helpers.dart';
@@ -218,7 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   CustomElevatedButton(
                     onPressed: () {
                       Get.to(
-                        () => VerifyTransaction(),
+                        () => utilitiesMainPage(),
                       );
                     },
                     label: "UTILITIES.",
@@ -240,20 +241,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final resp = await sasaPay.registerConfirmationUrl(
-            merchantCode: 600980.toString(),
-            confirmationCallbackURL: CALL_BACK_URL,
-          );
-          print(resp);
-          setState(() {
-            response = resp?.data;
-          });
-        },
-        tooltip: 'Test',
-        child: const Icon(Icons.add),
       ),
     );
   }
