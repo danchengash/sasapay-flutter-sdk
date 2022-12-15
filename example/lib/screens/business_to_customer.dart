@@ -451,7 +451,8 @@ class _Business2CustomerState extends State<Business2Customer> {
                                         channelCode: selectedBank!.bankCode,
                                         callBackURL: CALL_BACK_URL,
                                         transactionDesc: selectedReason,
-                                        accountReference:phoneNumberController.text,);
+                                        accountReference:phoneNumberController.text,
+                                        );
 
                                     setState(() {
                                       loading = false;
