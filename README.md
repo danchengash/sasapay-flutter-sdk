@@ -152,7 +152,7 @@ var resp = await sasaPay.queryMerchantAccountBalance(
 
 
 
-| Contributors                                       |
+| Maintainers                                      |
 | -------------------------------------------------- |
 | [DANCHE](https://github.com/danchengash) |
 
