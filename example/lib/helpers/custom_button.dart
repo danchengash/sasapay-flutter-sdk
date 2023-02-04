@@ -46,7 +46,7 @@ class CustomElevatedButton extends StatelessWidget {
               borderRadius: borderRadius,
               border: Border.all(
                 color: Colors.white,
-                strokeAlign: StrokeAlign.outside,
+                // strokeAlign: StrokeAlign.outside,
                 width: 0.2,
               )),
           child: Row(
