@@ -16,6 +16,19 @@ Ready Methods/APIs
 
 
 ## Getting Started
+# SDK IN ACTION
+<div style="text-align: center"><table><tr>
+<td style="text-align: center">
+
+<img src="https://raw.githubusercontent.com/Genialngash/sasapay-flutter-sdk/main/example/sdk_main_page.png" width="250" height="470"/>
+</td>
+<td style="text-align: center">
+<img src="https://raw.githubusercontent.com/Genialngash/sasapay-flutter-sdk/main/example/c2b.png" width="250" height="470"/>
+
+<td style="text-align: center">
+<img src="https://raw.githubusercontent.com/Genialngash/sasapay-flutter-sdk/main/example/b2b.png" width="250" height="470"/>
+</td>
+</tr></table></div>
 
 ### Credentials
 
@@ -113,7 +126,20 @@ var resp = await sasaPay.queryMerchantAccountBalance(
 ```dart
  List<BanksChannelCode?> result =SasaPay.getBanksCodes();
 ```
+## SDK IN ACTION
 
+<div style="text-align: center"><table><tr>
+<td style="text-align: center">
+
+<img src="https://raw.githubusercontent.com/Genialngash/sasapay-flutter-sdk/main/example/merchant_balance.png" width="250" height="470"/>
+</td>
+<td style="text-align: center">
+<img src="https://raw.githubusercontent.com/Genialngash/sasapay-flutter-sdk/main/example/b2c.png" width="250" height="470"/>
+</td>
+<td style="text-align: center">
+<img src="https://raw.githubusercontent.com/Genialngash/sasapay-flutter-sdk/main/example/process_c2B.png" width="250" height="470"/>
+
+</tr></table></div>
 
 ## Contributing
 
@@ -126,9 +152,9 @@ var resp = await sasaPay.queryMerchantAccountBalance(
 
 
 
-| Contributors                                       |
+| Maintainers                                      |
 | -------------------------------------------------- |
-| [DANCHE](https://github.com/Genialngash) |
+| [DANCHE](https://github.com/danchengash) |
 
 ----------------------------
 
