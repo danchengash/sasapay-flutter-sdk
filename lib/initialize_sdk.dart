@@ -100,7 +100,6 @@ class SasaPay {
 
   Future<Response?> customer2BusinessAliasNumber({
     required String merchantCode,
-
     /// SasaPay(0) 63902(MPesa) 63903(AirtelMoney) 63907(T-Kash)
     required String networkCode,
     required String aliasNumber,
