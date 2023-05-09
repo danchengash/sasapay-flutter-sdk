@@ -1,6 +1,7 @@
 name: sasapay_sdk
 description: wrapper around sasapay API'S, The Apis facilitate in collection and disbursement of funds, covers endpoints for C2B, B2C, B2B, Utilities and Wallet as a Service(WAAS). 
 version: 0.0.1
+author: Danche Nganga<ngangadanche@gmail.com>
 homepage: https://github.com/danchengash/sasapay-flutter-sdk
 
 environment:
